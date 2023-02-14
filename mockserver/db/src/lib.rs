@@ -1,14 +1,13 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub mod cake;
+pub use cake::Entity as Cake;
+pub mod fruit;
+pub use fruit::Entity as Fruit;
+use sea_orm::Database;
+pub use sea_orm::{self, DatabaseConnection, DbErr};
+const DATABASE_URL: &str = "sqlite://sqlite.db";
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub async fn getdb() -> Result<DatabaseConnection, DbErr> {
+    let db = Database::connect(DATABASE_URL).await?;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+    Ok(db)
 }
