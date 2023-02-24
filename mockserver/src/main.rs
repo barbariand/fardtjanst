@@ -1,5 +1,5 @@
 use actix_rt;
-use actix_session::config::SessionLifecycle;
+use actix_session::config::{PersistentSession, SessionLifecycle};
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware};
 use actix_web::cookie::Key;
 use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Result};
@@ -27,12 +27,13 @@ impl AppData {
         "Hello".to_string()
     }
 }
-#[get("/autherization")]
+#[get("/api/test")]
+async fn test(data: web::Data<AppData>, session: Session) {}
+#[get("/api/autherization")]
 async fn autherization(data: web::Data<AppData>, session: Session) -> Result<String> {
     session
         .insert("test", "testvalue")
         .expect("failed json serilisation");
-
     Ok(data.to_string())
 }
 
@@ -53,7 +54,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(
                 SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
-                    .session_lifecycle(SessionLifecycle),
+                    .session_lifecycle(SessionLifecycle::PersistentSession(
+                        PersistentSession::default(),
+                    ))
+                    .build(),
             )
             .service(autherization)
     })
