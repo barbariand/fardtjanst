@@ -1,0 +1,97 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#65c89b",
+        "activityBar.background": "#65c89b",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#945bc4",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#15202b99",
+        "sash.hoverBorder": "#65c89b",
+        "statusBar.background": "#42b883",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#359268",
+        "statusBarItem.remoteBackground": "#42b883",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#42b883",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#42b88399",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "peacock.remoteColor": "#42b883",
+    "multiCommand.commands": [
+        {
+            "command": "multiCommand.StartServer",
+            "sequence": [
+                "workbench.action.terminal.new",
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "cargo watch -w server -w src -x 'run'\u000D" // \u000D is a return so it runs
+                    }
+                }
+            ]
+        },
+        {
+            "command": "multiCommand.StartMockserver",
+            "sequence": [
+                "workbench.action.terminal.new",
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "cd mockserver && cargo watch -w db -w src -x 'run'\u000D" // \u000D is a return so it runs
+                    }
+                }
+            ]
+        },
+        {
+            "command": "multiCommand.StartFrontend",
+            "sequence": [
+                "workbench.action.terminal.new",
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        //using trunk.exe beacuse installing trunk on wsl somehow installs the exe (i think)
+                        "text": "cd app && trunk watch\u000D" // \u000D is a return so it runs
+                    }
+                }
+            ]
+        },
+        {
+            "command": "multiCommand.InitProjektLinux",
+            "sequence": [
+                "workbench.action.terminal.new",
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "./.vscode/installRequirements.sh\u000D"
+                    }
+                },
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "exit\u000D"
+                    }
+                }
+            ]
+        },
+        {
+            "command": "multiCommand.InitProjektWindows",
+            "sequence": [
+                "workbench.action.terminal.new",
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "./.vscode/installRequirements.bat\u000D"
+                    }
+                },
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "exit\u000D"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -28,7 +28,7 @@ impl AppData {
     }
 }
 #[get("/api/test")]
-async fn test(data: web::Data<AppData>, session: Session) {}
+async fn test(data: web::Data<AppData>, session: Session) -> Result<String> {}
 #[get("/api/autherization")]
 async fn autherization(data: web::Data<AppData>, session: Session) -> Result<String> {
     session
