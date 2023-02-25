@@ -2,6 +2,7 @@ use actix_rt;
 use actix_session::config::{PersistentSession, SessionLifecycle};
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware};
 use actix_web::cookie::Key;
+use actix_web::web::Json;
 use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Result};
 use db::{getdb, resor, sea_orm::*, users, Resor, Users};
 use env_logger::Env;
@@ -28,7 +29,9 @@ impl AppData {
     }
 }
 #[get("/api/test")]
-async fn test(data: web::Data<AppData>, session: Session) -> Result<String> {}
+async fn test(data: web::Data<AppData>, session: Session) -> Result<String> {
+    Ok("hellp".to_string())
+}
 #[get("/api/autherization")]
 async fn autherization(data: web::Data<AppData>, session: Session) -> Result<String> {
     session
