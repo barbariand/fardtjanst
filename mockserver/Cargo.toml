@@ -17,12 +17,15 @@ actix-web = "4.3.0"
 actix-web-actors = "4.2.0"
 actix-rt = "2.8.0"
 dotenv = "0.15.0"
-env_logger = "0.10.0"
+pretty_env_logger = "0.4.0"
 futures = "0.3.5"
 futures-util = "0.3.5"
 log = "0.4.0"
 serde="1.0.158"
 serde_json = "1"
-
-[Lib]
-proc-macro = true
+macros = {path="../macros"}
+bcrypt = "0.14.0"
+colored="2.0.0"
+slog="2.7.0"
+slog-async="2.7.0"
+slog-term="2.7.0"
