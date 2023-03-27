@@ -30,7 +30,13 @@
                 {
                     "command": "workbench.action.terminal.sendSequence",
                     "args": {
-                        "text": "cargo watch -w server -w src -x 'run'\u000D" // \u000D is a return so it runs
+                        "text": "cd server\u000D"
+                    }
+                },
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "cargo watch -w . -w ../src -x 'run'\u000D" // \u000D is a return so it runs
                     }
                 }
             ]
@@ -42,7 +48,13 @@
                 {
                     "command": "workbench.action.terminal.sendSequence",
                     "args": {
-                        "text": "cd mockserver && cargo watch -w db -w src -x 'run'\u000D" // \u000D is a return so it runs
+                        "text": "cd mockserver\u000D"
+                    }
+                },
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
+                        "text": "cargo watch -w . -w ../macros -x 'run'\u000D" // \u000D is a return so it runs
                     }
                 }
             ]
@@ -54,8 +66,14 @@
                 {
                     "command": "workbench.action.terminal.sendSequence",
                     "args": {
+                        "text": "cd app\u000D"
+                    }
+                },
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {
                         //using trunk.exe beacuse installing trunk on wsl somehow installs the exe (i think)
-                        "text": "cd app && trunk watch\u000D" // \u000D is a return so it runs
+                        "text": "trunk watch\u000D" // \u000D is a return so it runs
                     }
                 }
             ]
