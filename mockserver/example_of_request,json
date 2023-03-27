@@ -1,0 +1,471 @@
+{
+    "group": "Active",
+    "sortOrder": "TimeAscending",
+    "filter": "None",
+    "skip": 0,
+    "take": 100,
+    "remaining": 0,
+    "customerTransportReservation": [
+        {
+            "id": "202303270710",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "notes": "****2960****",
+            "allocationId": "2000142768",
+            "transports": [
+                "wheelChairTaxi"
+            ],
+            "transport": "wheelChairTaxi",
+            "from": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "to": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "departure": {
+                "id": "202303270710",
+                "transport": "wheelChairTaxi",
+                "transportProvider": "TaxiKurir",
+                "transportProviderName": "Taxi Kurir",
+                "transportId": "1442466",
+                "canBeCancelled": true,
+                "departure": "2023-03-27T05:10:00Z",
+                "from": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "to": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460",
+                    "notes": "****2960****"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [
+                "electricMoped",
+                "electricMoped"
+            ],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202303271450",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "allocationId": "2000142768",
+            "transports": [
+                "taxi"
+            ],
+            "transport": "taxi",
+            "from": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "to": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "departure": {
+                "id": "202303271450",
+                "transport": "taxi",
+                "canBeCancelled": true,
+                "departure": "2023-03-27T12:50:00Z",
+                "from": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "to": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202303280710",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "notes": "****2960****",
+            "allocationId": "2000142768",
+            "transports": [
+                "wheelChairTaxi"
+            ],
+            "transport": "wheelChairTaxi",
+            "from": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "to": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "departure": {
+                "id": "202303280710",
+                "transport": "wheelChairTaxi",
+                "transportProvider": "TaxiKurir",
+                "transportProviderName": "Taxi Kurir",
+                "canBeCancelled": true,
+                "departure": "2023-03-28T05:10:00Z",
+                "from": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "to": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460",
+                    "notes": "****2960****"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [
+                "electricMoped",
+                "electricMoped"
+            ],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202303281450",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "allocationId": "2000142768",
+            "transports": [
+                "taxi"
+            ],
+            "transport": "taxi",
+            "from": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "to": {
+                "id": "2100113640",
+                "address": "Ektorpsvägen 4, Ektorp, Nacka"
+            },
+            "departure": {
+                "id": "202303281450",
+                "transport": "taxi",
+                "canBeCancelled": true,
+                "departure": "2023-03-28T12:50:00Z",
+                "from": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "to": {
+                    "id": "2100113640",
+                    "address": "Ektorpsvägen 4, Ektorp, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202303300730",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "notes": "****2960****",
+            "allocationId": "2000142768",
+            "transports": [
+                "wheelChairTaxi"
+            ],
+            "transport": "wheelChairTaxi",
+            "from": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "to": {
+                "id": "2100672641",
+                "address": "Nacka Närsjukhus, Lasarettsvägen 4, Ektorp, Nacka"
+            },
+            "departure": {
+                "id": "202303300730",
+                "transport": "wheelChairTaxi",
+                "transportProvider": "TaxiKurir",
+                "transportProviderName": "Taxi Kurir",
+                "canBeCancelled": true,
+                "departure": "2023-03-30T05:30:00Z",
+                "from": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "to": {
+                    "id": "2100672641",
+                    "address": "Nacka Närsjukhus, Lasarettsvägen 4, Ektorp, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460",
+                    "notes": "****2960****"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [
+                "electricMoped",
+                "electricMoped"
+            ],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202303301450",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "notes": "****2960****",
+            "allocationId": "2000142768",
+            "transports": [
+                "wheelChairTaxi"
+            ],
+            "transport": "wheelChairTaxi",
+            "from": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "to": {
+                "id": "2100672641",
+                "address": "Nacka Närsjukhus, Lasarettsvägen 4, Ektorp, Nacka"
+            },
+            "departure": {
+                "id": "202303301450",
+                "transport": "wheelChairTaxi",
+                "transportProvider": "TaxiKurir",
+                "transportProviderName": "Taxi Kurir",
+                "canBeCancelled": true,
+                "departure": "2023-03-30T12:50:00Z",
+                "from": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "to": {
+                    "id": "2100672641",
+                    "address": "Nacka Närsjukhus, Lasarettsvägen 4, Ektorp, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460",
+                    "notes": "****2960****"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [
+                "electricMoped",
+                "electricMoped"
+            ],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202303310910",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "notes": "****2960****",
+            "allocationId": "2000142768",
+            "transports": [
+                "wheelChairTaxi"
+            ],
+            "transport": "wheelChairTaxi",
+            "from": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "to": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "departure": {
+                "id": "202303310910",
+                "transport": "wheelChairTaxi",
+                "transportProvider": "TaxiKurir",
+                "transportProviderName": "Taxi Kurir",
+                "canBeCancelled": true,
+                "departure": "2023-03-31T07:10:00Z",
+                "from": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "to": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460",
+                    "notes": "****2960****"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [
+                "electricMoped",
+                "electricMoped"
+            ],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202304031450",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "allocationId": "2000142768",
+            "transports": [
+                "wheelChairTaxi"
+            ],
+            "transport": "wheelChairTaxi",
+            "from": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "to": {
+                "id": "2100022518",
+                "address": "Backamovägen 7, Kummelnäs, Nacka"
+            },
+            "departure": {
+                "id": "202304031450",
+                "transport": "wheelChairTaxi",
+                "canBeCancelled": true,
+                "departure": "2023-04-03T12:50:00Z",
+                "from": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "to": {
+                    "id": "2100022518",
+                    "address": "Backamovägen 7, Kummelnäs, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [
+                "electricMoped"
+            ],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        },
+        {
+            "id": "202304041450",
+            "customerName": "Dante Nilsson",
+            "customerCardNumber": "14809149",
+            "phoneNumber": "0702239460",
+            "allocationId": "2000142768",
+            "transports": [
+                "taxi"
+            ],
+            "transport": "taxi",
+            "from": {
+                "id": "2100672633",
+                "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+            },
+            "to": {
+                "id": "2100113640",
+                "address": "Ektorpsvägen 4, Ektorp, Nacka"
+            },
+            "departure": {
+                "id": "202304041450",
+                "transport": "taxi",
+                "canBeCancelled": true,
+                "departure": "2023-04-04T12:50:00Z",
+                "from": {
+                    "id": "2100672633",
+                    "address": "Nacka Gymnasium, Griffelvägen 17, Järlahöjden, Nacka"
+                },
+                "to": {
+                    "id": "2100113640",
+                    "address": "Ektorpsvägen 4, Ektorp, Nacka"
+                },
+                "customerInfo": {
+                    "phoneNumber": "0702239460"
+                },
+                "hasReservationStatus": true,
+                "reservationStatus": {
+                    "status": "Resa beställd."
+                }
+            },
+            "passengers": 1,
+            "childPassengers": 0,
+            "attributes": [],
+            "appliances": [],
+            "isShared": false,
+            "canBeNewTripTemplate": false,
+            "canBeCancelled": true
+        }
+    ]
+}
