@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(Mutex::new(0)))
             .service(hello)
             .service(jsondata)
-            .service(Files::new("/", "./dist/").index_file("index.html"))
+            .service(Files::new("/", "./../dist/").index_file("index.html"))
             .default_service(web::to(|| async {
                 HttpResponse::Found()
                     .append_header(("Location", "/"))

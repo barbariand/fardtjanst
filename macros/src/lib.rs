@@ -1,4 +1,5 @@
 extern crate proc_macro;
+
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote;
@@ -19,6 +20,7 @@ use syn::{
     punctuated::Punctuated,
     Ident, Token,
 };
+
 struct Args {
     vars: HashSet<Ident>,
 }
@@ -181,47 +183,48 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
     let session_name_tokens = session_name_tok.into_token_stream();
     let expanded = quote::quote! {
         #(#attrs)* #vis #sig {
-            let result =#session_name_tokens.get::<i32>("id");
-    let sessionid = match result {
-        Ok(maybesessionid) => match maybesessionid {
-            Some(sid) => sid,
-            None => return Ok(HttpResponse::InternalServerError().body("Sessionid was not fund".to_string())),
-        },
-        Err(e) => return Ok(HttpResponse::InternalServerError().body(e.to_string())),
-    };
 
-    let _res = users::Entity::find()
-        .join(
-            sea_orm::JoinType::LeftJoin,
-            users::Relation::TempSessions
-                .def()
-                .on_condition(move |_left, _right| {
-                    sea_orm::sea_query::Expr::col(tempsessions::Column::UserId)
-                        .is(sessionid)
-                        .into_condition()
-                }),
-        )
-        .one(data.get_db())
-        .await;
-    let __res = tempsessions::Entity::find().all(data.get_db()).await;
-    match __res {
-        Ok(op) => {
-            let len=op.len();
-            for m in op {
-                println!("model: {:?}", m)
-            }
-            println!("that is all, total length was: {}",len);
-        }
-        Err(e) => return Ok(HttpResponse::InternalServerError().body(e.to_string())),
-    };
-        let user = match _res {
-            Ok(op) => match op {
-                Some(us) => us,
-                None => return Ok(HttpResponse::Unauthorized().body("Hello".to_string())),
+            let result =#session_name_tokens.get::<i32>("id");
+            let sessionid = match result {
+            Ok(maybesessionid) => match maybesessionid {
+                Some(sid) => sid,
+                None => return Ok(HttpResponse::InternalServerError().body("Sessionid was not fund".to_string())),
             },
             Err(e) => return Ok(HttpResponse::InternalServerError().body(e.to_string())),
-            };
-            #(#stmts)*
+        };
+
+        let _res = users::Entity::find()
+            .join(
+                sea_orm::JoinType::LeftJoin,
+                users::Relation::TempSessions
+                    .def()
+                    .on_condition(move |_left, _right| {
+                        sea_orm::sea_query::Expr::col(tempsessions::Column::UserId)
+                            .is(sessionid)
+                            .into_condition()
+                    }),
+            )
+            .one(data.get_db())
+            .await;
+        let __res = tempsessions::Entity::find().all(data.get_db()).await;
+        match __res {
+            Ok(op) => {
+                let len=op.len();
+                for m in op {
+                    println!("model: {:?}", m)
+                }
+                println!("that is all, total length was: {}",len);
+            }
+            Err(e) => return Ok(HttpResponse::InternalServerError().body(e.to_string())),
+        };
+            let user = match _res {
+                Ok(op) => match op {
+                    Some(us) => us,
+                    None => return Ok(HttpResponse::Unauthorized().body("Hello".to_string())),
+                },
+                Err(e) => return Ok(HttpResponse::InternalServerError().body(e.to_string())),
+                };
+        #(#stmts)*
         }
     };
     // Hand the output tokens back to the compiler

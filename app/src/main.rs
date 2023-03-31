@@ -5,7 +5,7 @@ use yew::{
     prelude::*,
     services::{
         fetch::{FetchTask, Request, Response},
-        FetchService,
+        ComponentLink, FetchService,
     },
 };
 
@@ -117,5 +117,5 @@ impl Component for Model {
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::start_app::<Model>();
+    yew::ServerRenderer::<Model>();
 }

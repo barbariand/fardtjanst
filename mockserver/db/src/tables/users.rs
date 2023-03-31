@@ -1,7 +1,6 @@
 use sea_orm;
 use sea_orm::entity::prelude::*;
-#[cfg(feature = "with-json")]
-use serde::{Deserialize, Serialize};
+
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "users")]
 pub struct Model {
@@ -10,6 +9,7 @@ pub struct Model {
     pub name: String,
     pub password: String,
     pub card_nummer: i32,
+    pub phone_number: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
