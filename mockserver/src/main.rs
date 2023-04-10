@@ -47,8 +47,9 @@ async fn main() -> std::io::Result<()> {
                     ))
                     .build(),
             )
-            .service(routes::testifauth)
+            .service(routes::api::trips)
             .service(routes::api::autherization)
+            .service(routes::api::order)
     })
     .bind("127.0.0.1:5376")?
     .run()

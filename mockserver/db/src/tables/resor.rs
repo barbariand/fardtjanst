@@ -14,7 +14,7 @@ pub struct Model {
     pub from_addres: String,
     pub by_addres: Option<String>,
     pub user_id: Option<i32>,
-    pub time: i32,
+    pub time: i64,
     pub passagers: i32,
     pub child_passagers: i32,
     pub is_shared: bool,

@@ -177,8 +177,48 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
             .into()
         }
     };
-    // Build the output, possibly using quasi-quotation
+    // Find the Session input parameter, if it exists
+    let appdata_param = sig.inputs.iter().find_map(|param| match param {
+        syn::FnArg::Typed(syn::PatType { pat, ty, .. }) => match ty.as_ref() {
+            Type::Path(syn::TypePath { path, .. }) => {
+                if let Some(ident) = path.segments.last() {
+                    if let syn::PathArguments::AngleBracketed(args) = &ident.arguments {
+                        if let Some(arg) = args.args.first() {
+                            if let syn::GenericArgument::Type(Type::Path(type_path)) = arg {
+                                if let Some(ident) = type_path.path.segments.last() {
+                                    if ident.ident == "AppData" {
+                                        return Some(pat.clone());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                None
+            }
+            _ => None,
+        },
+        _ => None,
+    });
 
+    // If the Session input parameter was not found, return an error
+    let appdata_name = match appdata_param {
+        Some(pat) => match pat.as_ref() {
+            syn::Pat::Ident(syn::PatIdent { ident, .. }) => ident.to_string(),
+            _ => "data".to_string(),
+        },
+        None => {
+            return syn::Error::new_spanned(
+                input_fn,
+                "function must have an input parameter of type `web::Data<AppData>`",
+            )
+            .to_compile_error()
+            .into()
+        }
+    };
+    // Build the output, possibly using quasi-quotation
+    let appdata_name_tok: TokenStream2 = appdata_name.parse().unwrap();
+    let appdata_name_tokens = appdata_name_tok.into_token_stream();
     let session_name_tok: TokenStream2 = session_name.parse().unwrap();
     let session_name_tokens = session_name_tok.into_token_stream();
     let expanded = quote::quote! {
@@ -204,9 +244,9 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
                             .into_condition()
                     }),
             )
-            .one(data.get_db())
+            .one(#appdata_name_tokens.get_db())
             .await;
-        let __res = tempsessions::Entity::find().all(data.get_db()).await;
+        let __res = tempsessions::Entity::find().all(#appdata_name_tokens.get_db()).await;
         match __res {
             Ok(op) => {
                 let len=op.len();
@@ -228,5 +268,6 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
         }
     };
     // Hand the output tokens back to the compiler
+    println!("{}", expanded);
     TokenStream::from(expanded)
 }

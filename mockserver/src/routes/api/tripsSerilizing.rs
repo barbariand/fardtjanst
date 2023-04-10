@@ -1,7 +1,14 @@
 #![allow(non_snake_case)] //beacuse needs serialzieble to json with CamelCaseNames :)
 use chrono::{TimeZone, Utc};
 
-use db::{resor, users};
+use db::{
+    resor,
+    sea_orm::{
+        query, Condition, DbBackend, EntityTrait, QueryFilter, QueryOrder, QuerySelect, Select,
+    },
+    users,
+};
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -213,7 +220,7 @@ pub struct Trips {
 }
 impl Trips {
     pub fn try_new(user: &users::Model, resor: &resor::Model) -> Result<Trips, String> {
-        let datetime = match Utc.timestamp_millis_opt(resor.time as i64 * 1000) {
+        let datetime = match Utc.timestamp_millis_opt(resor.time as i64) {
             chrono::LocalResult::Ambiguous(a, _) => a,
             chrono::LocalResult::None => return Err("failed to create time".to_string()),
             chrono::LocalResult::Single(s) => s,
@@ -338,17 +345,12 @@ pub struct TripsRequest {
     filter: String,
     skip: i32,
     take: i32,
-    remaining: i32,
-    customerTransportReservation: Vec<Trips>,
+    remaining: Option<i32>,
+    customerTransportReservation: Option<Vec<Trips>>,
 }
 impl TripsRequest {
-    pub fn new(
-        group: String,
-        sort_order: String,
-        filter: String,
-        skip: i32,
-        take: i32,
-        remaining: i32,
+    pub fn addTrips(
+        mut self,
         user: &users::Model,
         resor: &Vec<resor::Model>,
     ) -> Result<TripsRequest, String> {
@@ -356,14 +358,26 @@ impl TripsRequest {
         for resa in resor {
             vec.push(Trips::try_new(user, resa)?);
         }
-        Ok(TripsRequest {
-            group,
-            sortOrder: sort_order,
-            filter,
-            customerTransportReservation: vec,
-            remaining,
-            skip,
-            take,
-        })
+        self.customerTransportReservation = Some(vec);
+        Ok(self)
+    }
+    pub fn generate_query(&self) -> Select<db::resor::Entity> {
+        use db::sea_orm::ColumnTrait;
+        use db::sea_orm::QueryTrait;
+        let mut query = resor::Entity::find();
+        query = match self.sortOrder.as_str() {
+            "TimeAscending" => query.order_by_asc(resor::Column::Time),
+            _ => query.order_by_desc(resor::Column::Time),
+        };
+
+        let time = Utc::now().timestamp();
+        query = match self.group.as_str() {
+            "Active" => query.filter(Condition::any().add(resor::Column::Time.lte(time))),
+            "Historical" => query.filter(Condition::any().add(resor::Column::Time.gte(time))),
+            _ => query.filter(Condition::any().add(resor::Column::Time.lte(time))),
+        };
+        query = query.offset(self.skip as u64).limit(self.take as u64);
+        info!("{}", query.build(DbBackend::Sqlite).to_string());
+        query
     }
 }

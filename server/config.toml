@@ -1,0 +1,2 @@
+[env]
+CARGO_TARGET_DIR={ value = "./server/target", force = true }

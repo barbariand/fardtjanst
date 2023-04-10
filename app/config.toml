@@ -1,0 +1,2 @@
+[env]
+CARGO_TARGET_DIR={ value = "./app/target", force = true }
