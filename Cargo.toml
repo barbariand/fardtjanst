@@ -10,5 +10,5 @@ serde = { version = "1.0", features = ["derive"] }
 rand = "0.8.4"
 
 [workspace]
-members = ["server", "app","mockserver","mockserver/db"]
+members = ["server", "app", "mockserver"]
 default-members = ["server"]

@@ -30,3 +30,6 @@ slog="2.7.0"
 slog-async="2.7.0"
 slog-term="2.7.0"
 chrono="0.4.24"
+
+[workspace]
+members = ["./db"]

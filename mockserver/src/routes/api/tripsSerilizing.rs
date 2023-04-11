@@ -365,14 +365,22 @@ impl TripsRequest {
         use db::sea_orm::ColumnTrait;
         use db::sea_orm::QueryTrait;
         let mut query = resor::Entity::find();
-        query = match self.sortOrder.as_str() {
-            "TimeAscending" => query.order_by_asc(resor::Column::Time),
-            _ => query.order_by_desc(resor::Column::Time),
+        query= match self.filter.as_str(){
+            "SharedTrip"=>query.filter(resor::Column::IsShared.eq(true)),
+            "NotSharedTrip"=>query.filter(resor::Column::IsShared.eq(false)),
+            "Taxi"=>query.filter(resor::Column::Transport.eq("Taxi")),
+            "WheelChairTaxi"=>query.filter(resor::Column::Transport.eq("WheelChairTaxi")),
+            _=>query,
         };
-
+        query = match self.sortOrder.as_str() {
+            "TimeDescending" => query.order_by_asc(resor::Column::Time),
+            "TimeAscending" => query.order_by_desc(resor::Column::Time),
+            "FromAddress"=> query.order_by_asc(resor::Column::FromAddres),
+            "ToAddress"=> query.order_by_asc(resor::Column::ToAddres),
+            _=>query.order_by_asc(resor::Column::Time),
+        };
         let time = Utc::now().timestamp();
         query = match self.group.as_str() {
-            "Active" => query.filter(Condition::any().add(resor::Column::Time.lte(time))),
             "Historical" => query.filter(Condition::any().add(resor::Column::Time.gte(time))),
             _ => query.filter(Condition::any().add(resor::Column::Time.lte(time))),
         };
