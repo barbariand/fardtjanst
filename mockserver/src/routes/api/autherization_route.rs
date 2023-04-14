@@ -6,6 +6,7 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use actix_web::Responder;
 use actix_web::Result;
+use mockserverdb as db;
 use db::{
     sea_orm::{ColumnTrait, EntityTrait, QueryFilter},
     tempsessions, users, TempSession, Users,

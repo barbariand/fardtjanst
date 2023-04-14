@@ -5,7 +5,7 @@ pub use tables::tempsessions;
 pub use tables::users;
 pub use tempsessions::Entity as TempSession;
 pub use users::Entity as Users;
-const DATABASE_URL: &str = "sqlite://memory";
+const DATABASE_URL: &str = "sqlite://sqlite.db";
 
 pub async fn getdb() -> Result<DatabaseConnection, DbErr> {
     let db = Database::connect(DATABASE_URL).await?;

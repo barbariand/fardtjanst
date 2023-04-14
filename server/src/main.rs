@@ -1,44 +1,55 @@
-use std::sync::Mutex;
-use actix_web::{
-    get, middleware::Logger, web, web::Data, App, HttpResponse, HttpServer, Responder,Result
+use actix_web::{rt,
+    get, middleware::Logger, web, App, HttpResponse, HttpServer, Responder,Result
 };
-use env_logger::Env;
-use log::info;
-use my_web_app::MyTestStruct;
-use actix_rt;
+use reqwest;
 use actix_session::{
     config::{PersistentSession, SessionLifecycle},
     storage::CookieSessionStore,
     SessionMiddleware,Session
 };
-use db::{
-    sea_orm::{self,ColumnTrait, EntityTrait, QueryFilter,QuerySelect,RelationTrait,sea_query::IntoCondition},
-    tempsessions, users, TempSession, Users,
+use std::{time::Duration, sync::Arc};
+use db::{self,
+    sea_orm::{self, EntityTrait,QuerySelect,RelationTrait,sea_query::IntoCondition},
+    tempsessions, users, 
 };
 use actix_web::cookie::Key;
-use serverdb as db;
 use macros;
 use futures::executor::block_on;
-#[get("/hello")]
+const MOCK_SERVER_URL:&str="http://127.0.0.1:5376";
+#[get("/start")]
 async fn hello() -> impl Responder {
-    info!("Sending a String.");
-    "Hello Cindy"
+    
+    "start"
 }
-
+#[get("/stop")]
+async fn stop()-> impl Responder{
+    "hII"
+}
 #[get("/trips")]
 #[macros::restricted_route]
-pub(crate) async fn trips(
+async fn trips(
     data: web::Data<AppData>,
     session: Session,
 ) -> Result<impl Responder> {
     Ok(HttpResponse::Ok().finish())
 }
-
+struct BackgroundProsesor{
+    data_base: sea_orm::DatabaseConnection,
+}
+impl BackgroundProsesor{
+    async fn run(){
+        loop{
+            
+        }
+    }
+}
 const MAX_PAYLOAD_SIZE: usize = 262_144;
 #[derive(Clone)]
 struct AppData {
     data_base: sea_orm::DatabaseConnection,
+    backgroundprossesor:Arc<BackgroundProsesor>
 }
+
 
 impl AppData {
     fn get_db(&self) -> &db::DatabaseConnection {
@@ -46,17 +57,22 @@ impl AppData {
     }
     fn new(data_base: db::DatabaseConnection) -> AppData {
         AppData {
-            data_base: data_base,
+            data_base:data_base.clone(),
+            backgroundprossesor:Arc::new(BackgroundProsesor{
+                data_base,
+            }),
         }
     }
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(
-        Env::default()
-            .default_filter_or("debug"),
-    );
+    let secret_key = Key::generate();
+    //gets database
+    let data_base = block_on(db::getdb()).expect("Could not create or find database:");
+    std::env::set_var("RUST_LOG", "debug");
+    pretty_env_logger::init();
+    let app_data = AppData::new(data_base);
     HttpServer::new(move || {
         App::new()
         .app_data(web::Data::new(app_data.clone()))
@@ -69,9 +85,9 @@ async fn main() -> std::io::Result<()> {
                 .build(),
         )
             .service(hello)
-            .service(jsondata)
+            .service(trips)
     })
-    .bind("127.0.0.1:8080")?
+    .bind("127.0.0.1:5377")?
     .run()
     .await
 }

@@ -9,6 +9,7 @@ use actix_session::{
 use actix_web::cookie::Key;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 mod routes;
+use mockserverdb as db;
 use db::sea_orm;
 use futures::executor::block_on;
 const MAX_PAYLOAD_SIZE: usize = 262_144;

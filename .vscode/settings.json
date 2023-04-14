@@ -115,8 +115,4 @@
             ]
         }
     ],
-    "rust-analyzer.linkedProjects": [
-        "./server/db/Cargo.toml",
-        "./server/serverdb/Cargo.toml"
-    ]
 }
