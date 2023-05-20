@@ -6,13 +6,12 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use actix_web::Responder;
 use actix_web::Result;
-use crate::db as db;
+use mockserverdb as db;
 use db::{
     sea_orm::{ColumnTrait, EntityTrait, QueryFilter},
     tempsessions, users, TempSession, Users,
 };
 use futures::StreamExt;
-use log::debug;
 use log::error;
 use serde::{Deserialize, Serialize};
 
@@ -56,8 +55,6 @@ async fn autherization(
     let httpresponse: HttpResponse = match userres {
         Ok(user) => match user {
             Some(u) => {
-                //TODO encrypt password
-
                 match bcrypt::verify(auth.password, u.password.as_str()) {
                     Ok(sucsess) => match sucsess {
                         true => (),

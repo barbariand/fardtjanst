@@ -1,0 +1,17 @@
+
+[clean]
+# The output dir for all final assets.
+dist = "dist"
+# Optionally perform a cargo clean.
+cargo = false
+
+[[proxy]]
+# This proxy example has a backend and a rewrite field. Requests received on `rewrite` will be
+# proxied to the backend after rewriting the `rewrite` prefix to the `backend`'s URI prefix.
+# E.G., `/api/v1/resource/x/y/z` -> `/resource/x/y/z`
+rewrite = "/resources/"
+backend = "http://localhost:5377/static/"
+
+[[proxy]]
+rewrite = "/api/"
+backend = "http://localhost:5377/"

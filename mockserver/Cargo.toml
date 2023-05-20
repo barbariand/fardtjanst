@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 actix-session = { version = "0.7.2", features = ["cookie-session"] }
-mockserverdb={path="./mockserverdb"}
+sea-orm = { version = "0.11.2", features = [ "sqlx-sqlite", "runtime-actix-rustls", "macros","debug-print", "serde_json"] }
 actix = "0.13.0"
 actix-cors = "0.6.4"
 actix-http = "3.3.0"

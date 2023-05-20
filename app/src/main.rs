@@ -1,5 +1,6 @@
-use leptos::*;
-
+use app::*;
+use leptos::view;
 fn main() {
-    mount_to_body(|cx| view! { cx,  <p>"Hello, world!"</p> })
+    use leptos::mount_to_body;
+    mount_to_body(|cx| view! { cx,  <Start /> })
 }

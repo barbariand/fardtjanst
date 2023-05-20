@@ -1,19 +1,24 @@
 [package]
 name = "server"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
+tokio = "1.0.0"
+sea-orm = { version = "0.11.2", features = [ "sqlx-sqlite", "runtime-actix-rustls", "macros","debug-print", "serde_json"] }
+ctrlc = { version = "3.2.5", features = ["termination"] }
+actix-files = "0.6.2"
 actix = "0.13.0"
+actix-rt = "2.8.0"
+background-jobs = "0.15.0"
 actix-cors = "0.6.4"
 actix-http = "3.3.0"
 actix-identity = "0.5.2"
 actix-service = "2.0.2"
 actix-web = "4.3.0"
 actix-web-actors = "4.2.0"
-actix-rt = "2.8.0"
-my-web-app = {path=".."}
+my-web-app = { path = ".." }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 log = "0.4"
@@ -22,13 +27,13 @@ dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
 futures = "0.3.5"
 futures-util = "0.3.5"
-macros = {path="../macros"}
+macros = { path = "../macros" }
 bcrypt = "0.14.0"
-colored="2.0.0"
-slog="2.7.0"
-slog-async="2.7.0"
-slog-term="2.7.0"
-chrono="0.4.24"
-db={path="./db"}
+colored = "2.0.0"
+slog = "2.7.0"
+slog-async = "2.7.0"
+slog-term = "2.7.0"
+chrono = "0.4.24"
 actix-session = { version = "0.7.2", features = ["cookie-session"] }
-reqwest="0.11.16"
+reqwest = "0.11.16"
+web-push = "0.9.5"
