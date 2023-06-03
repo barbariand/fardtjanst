@@ -1,5 +1,5 @@
 #![allow(non_snake_case)] //beacuse needs serialzieble to json with CamelCaseNames :)
-use chrono::{TimeZone, Utc};
+use chrono::{TimeZone, Utc,Duration};
 use crate::db as db;
 use db::{
     resor,
@@ -10,7 +10,7 @@ use db::{
 };
 use log::info;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+use std::{str::FromStr};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 enum Transport {
     #[allow(non_camel_case_types)]
@@ -379,7 +379,7 @@ impl TripsRequest {
             "ToAddress"=> query.order_by_asc(resor::Column::ToAddres),
             _=>query.order_by_asc(resor::Column::Time),
         };
-        let time = Utc::now().timestamp();
+        let time = Utc::now().checked_sub_signed(Duration::hours(1)).expect("shoukd be able to add 1 hour").timestamp();
         query = match self.group.as_str() {
             "Historical" => query.filter(Condition::any().add(resor::Column::Time.gte(time))),
             _ => query.filter(Condition::any().add(resor::Column::Time.lte(time))),

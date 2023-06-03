@@ -20,7 +20,7 @@ pub(crate) async fn trips(
     session: Session,
     query: web::Query<TripsRequest>,
 ) -> Result<impl Responder> {
-    let trips = query.0;
+    let trips = query.into_inner();
     let resorquery = trips.generate_query();
 
     let mayberesor = resorquery.all(data.get_db()).await;
