@@ -1,21 +1,5 @@
 self.addEventListener('push', function(event) {
-    const pushInfoPromise = fetch('/api/get-more-data')
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(response) {
-        const title = response.data.userName + ' says...';
-        const message = response.data.message;
-
-        self.registration.showNotification(title, {
-        body: message
-        });
-    });
-
-    const promiseChain = Promise.all([
-    analyticsPromise,
-    pushInfoPromise
-    ]);
-
+    let not=event.data.json();
+    const promiseChain = self.registration.showNotification(not.title,not.options)
     event.waitUntil(promiseChain);
 });

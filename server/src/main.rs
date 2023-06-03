@@ -1,3 +1,4 @@
+#![feature(let_chains)]
 use actix::{Actor, Context, Arbiter};
 use actix_session::config::{PersistentSession, SessionLifecycle};
 use actix_session::storage::CookieSessionStore;
@@ -70,20 +71,6 @@ async fn registerNotifier(data: web::Data<AppData>,mut payload: web::Payload) ->
             return Err(error::ErrorBadRequest("Invalid json"));
         }
     };
-    //Read signing material for payload.
-    let file = File::open("private_key.pem").unwrap();
-    let sig_builder = web_push::VapidSignatureBuilder::from_pem(file, &subscription_info).map_err(to_response_error)?.build().map_err(to_response_error)?;
-
-    //Now add payload and encrypt.
-    let mut builder = web_push::WebPushMessageBuilder::new(&subscription_info).map_err(to_response_error)?;
-    let content = "Encrypted payload to be sent in the notification".as_bytes();
-    builder.set_payload(web_push::ContentEncoding::Aes128Gcm, content);
-    builder.set_vapid_signature(sig_builder);
-
-    let client = web_push::WebPushClient::new().map_err(to_response_error)?;
-
-    //Finally, send the notification!
-    client.send(builder.build().map_err(to_response_error)?).await.map_err(to_response_error)?;
     Ok("hello")
 }
 
@@ -106,7 +93,7 @@ impl AppData {
 }
 struct SumActor {}
 
-impl Actor for SumActor {
+impl Actor for SumActor { 
     type Context = Context<Self>;
 }
 #[actix::main]
@@ -139,9 +126,6 @@ async fn main() -> std::io::Result<()> {
     Arbiter::new().spawn_fn(move|| {
         bg.start();
     });
-    
-    
-
     let serverarbiter=Arbiter::new();
     serverarbiter.spawn_fn(move || {
         block_on( async{
