@@ -7,7 +7,7 @@ use actix_web::cookie::Key;
 use actix_files::Files;
 use actix_web::cookie::time::Duration;
 use actix_web::{
-    get,post, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,
+    get,post, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,HttpRequest
 };
 use web_push;
 mod backgroundtask;
@@ -20,7 +20,7 @@ use db::{
 use futures::StreamExt;
 use actix_web::{error, ResponseError};
 use std::fs::File;
-use log::error;
+use log::{error, info};
 use futures::executor::block_on;
 use macros;
 
@@ -74,6 +74,14 @@ async fn registerNotifier(data: web::Data<AppData>,mut payload: web::Payload) ->
     Ok("hello")
 }
 
+#[get("/checkheaders")]
+async fn checkheaders(data: web::Data<AppData>, session: Session,req: HttpRequest)->Result<impl Responder>{
+    match req.cookie("id") {
+        Some(cookie) => format!("Cookie: {}", cookie.value()),
+        None => "No cookie found".to_string(),
+    }
+    Ok("")
+}
 pub const MAX_PAYLOAD_SIZE: usize = 262_144;
 #[derive(Clone)]
 struct AppData {
@@ -116,6 +124,7 @@ async fn main() -> std::io::Result<()> {
                     ))
                     .build(),
                 )
+            .service(checkheaders)
             .service(trips)
             .service(Files::new("/static", "./static").prefer_utf8(true))
             .service(registerNotifier)
