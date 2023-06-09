@@ -15,10 +15,10 @@ use std::future::Future;
 use log::debug;
 use log::error;
 use log::info;
-use reqwest;
+
 use sea_orm::EntityTrait;
 use serde::Serialize;
-use serde_json;
+
 
 use std::pin::Pin;
 use std::sync::atomic::Ordering;
@@ -53,11 +53,8 @@ impl BackgroundActor {
         while running.load(Ordering::SeqCst) {
             if i == 0 {
                 let resp = self.clone().handle_users(&db).await;
-                match resp {
-                    Err(err) => {
-                        error!("Error opening DB: {}", err)
-                    }
-                    Ok(_) => {}
+                if let Err(err) = resp {
+                    error!("Error opening DB: {}", err)
                 }
             }
             i = (i + 1) % loops;
@@ -207,9 +204,9 @@ impl NotificationActor {
             .notification_infos
             .as_ref()
             .iter()
-            .filter(|not| not.UserId == self.user.id)
+            .filter(|not| not.user_id == self.user.id)
             .collect();
-        if notify.len() < 1 {
+        if notify.is_empty() {
             return;
         }
         let after = Utc::now();
@@ -248,7 +245,7 @@ impl NotificationActor {
         };
         if let Some(status) = current_trip.get_departure().get_status() {
             if status == ReservationStatusEnum::BilPåväg {
-                self.send_notification(&current_trip);
+                self.send_notification(current_trip);
                 return;
             }
         };
@@ -288,7 +285,7 @@ impl NotificationActor {
         };
         if let Some(status) = current_trip.get_departure().get_status() {
             if status == ReservationStatusEnum::BilPåväg {
-                self.send_notification(&current_trip);
+                self.send_notification(current_trip);
                 return;
             }
         };
@@ -352,9 +349,8 @@ async fn get_trip_request(user: &users::Model) -> Result<TripsRequest, Backgroun
             "Cookie",
             *cookieheader
                 .to_str()?
-                .split(";")
-                .collect::<Vec<&str>>()
-                .get(0)
+                .split(';')
+                .collect::<Vec<&str>>().first()
                 .ok_or(BackgroundTaskError {
                     msg: "string is empty".to_string(),
                 })?,

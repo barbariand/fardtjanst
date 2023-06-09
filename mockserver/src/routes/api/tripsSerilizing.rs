@@ -231,7 +231,7 @@ pub struct Trips {
 }
 impl Trips {
     pub fn try_new(user: &users::Model, resor: &resor::Model) -> Result<Trips, String> {
-        let datetime = match Utc.timestamp_millis_opt(resor.time as i64) {
+        let datetime = match Utc.timestamp_millis_opt(resor.time) {
             chrono::LocalResult::Ambiguous(a, _) => a,
             chrono::LocalResult::None => return Err("failed to create time".to_string()),
             chrono::LocalResult::Single(s) => s,
@@ -244,10 +244,7 @@ impl Trips {
         };
         let from = Address::new(resor.from_id, resor.from_addres.clone());
         let by = match resor.by_id {
-            Some(id) => match resor.by_addres.clone() {
-                Some(address) => Some(Address::new(id, address)),
-                None => None,
-            },
+            Some(id) => resor.by_addres.clone().map(|address| Address::new(id, address)),
             None => None,
         };
         //let by = Some(Address::new(resor.by_id, resor.by_addres.clone()));
@@ -256,8 +253,7 @@ impl Trips {
         let notes = Some(String::new());
         let reservation_status = match resor.status.clone() {
             Some(status) => ReservationStatusEnum::from_str(&status)
-                .ok()
-                .and_then(|e| Some(ReservationStatus { status: e })),
+                .ok().map(|e| ReservationStatus { status: e }),
             None => None,
         };
         let customer_info = CustomerInfo {

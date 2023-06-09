@@ -1,6 +1,4 @@
-use crate::db;
-use actix_web::cookie::time::serde::timestamp;
-use db::notification_info;
+
 use serde::Serialize;
 use serde_json;
 use std::fs::File;
@@ -13,6 +11,7 @@ pub struct NotificationAction {
     icon: Option<String>, //icon URL
 }
 impl NotificationAction {
+    #[expect(dead_code)]
     fn new(action: String, title: String, icon: Option<String>) -> Self {
         Self {
             action,
@@ -57,6 +56,7 @@ impl NotificationOptions {
     fn add_icon(&mut self, icon: String) {
         self.icon = Some(icon);
     }
+    #[expect(dead_code)]
     fn add_image(&mut self, image: String) {
         self.image = Some(image);
     }
@@ -118,6 +118,7 @@ impl Notification {
         self.options.add_icon(icon);
         self
     }
+    #[expect(dead_code)]
     pub fn add_image(mut self, image: String)->Self {
         self.options.add_image(image);
         self
@@ -154,7 +155,7 @@ impl Notification {
 
 /// sends the notification usint the subscription_info 
 /// will return error if it fails
-pub async fn sendNotification(
+pub async fn send_notification(
     subscription_info: web_push::SubscriptionInfo,
     notification: Notification,
 ) -> Result<(), web_push::WebPushError> {

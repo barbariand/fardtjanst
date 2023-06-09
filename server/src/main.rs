@@ -1,5 +1,6 @@
 #![feature(let_chains)]
 #![feature(drain_filter)]
+#![feature(lint_reasons)]
 use actix::{Actor, Context, Arbiter};
 use actix_session::config::{PersistentSession, SessionLifecycle};
 use actix_session::storage::CookieSessionStore;
@@ -10,7 +11,7 @@ use actix_web::error::ErrorInternalServerError;
 use actix_web::{
     get,post, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,HttpRequest
 };
-use web_push;
+
 mod backgroundtask;
 use backgroundtask::BackgroundActor;
 pub mod db;
@@ -22,7 +23,7 @@ use futures::StreamExt;
 use actix_web::{error};
 use log::{error, info};
 use futures::executor::block_on;
-use macros;
+
 
 pub const MOCK_SERVER_URL: &str = "http://127.0.0.1:5376";
 
@@ -58,14 +59,14 @@ async fn register_notifier(data: web::Data<AppData>,mut payload: web::Payload, s
         }
     };
     let notification_info=db::notification_info::ActiveModel{
-        UserId:sea_orm::ActiveValue::Set(user.id),
+        user_id:sea_orm::ActiveValue::Set(user.id),
         endpoint:sea_orm::ActiveValue::Set(subscription_info.endpoint),
         auth:sea_orm::ActiveValue::Set(subscription_info.keys.auth),
         p256dh:sea_orm::ActiveValue::Set(subscription_info.keys.p256dh),
         ..Default::default()
     };
     let res=notification_info.insert(&data.data_base).await;
-    if let Err(_)= res{
+    if res.is_err(){
         return Err(ErrorInternalServerError("Database error"));
     };
     Ok(HttpResponse::Ok().finish())
@@ -92,7 +93,7 @@ impl AppData {
     }
     fn new(data_base: db::DatabaseConnection) -> AppData {
         AppData {
-            data_base: data_base.clone(),
+            data_base,
         }
     }
     

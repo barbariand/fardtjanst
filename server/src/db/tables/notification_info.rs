@@ -1,4 +1,4 @@
-use sea_orm::{self, ActiveValue::NotSet};
+use sea_orm::{self};
 use sea_orm::entity::prelude::*;
 
 
@@ -11,7 +11,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[cfg_attr(feature = "with-json", serde(skip_deserializing))]
     pub id: i32,
-    pub UserId:i32,
+    pub user_id:i32,
     pub endpoint:String,
     pub p256dh: String,
     pub auth: String,
