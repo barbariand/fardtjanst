@@ -1,11 +1,12 @@
 #![feature(let_chains)]
+#![feature(drain_filter)]
 use actix::{Actor, Context, Arbiter};
 use actix_session::config::{PersistentSession, SessionLifecycle};
 use actix_session::storage::CookieSessionStore;
 use actix_session::{Session, SessionMiddleware};
 use actix_web::cookie::Key;
 use actix_files::Files;
-use actix_web::cookie::time::Duration;
+use actix_web::error::ErrorInternalServerError;
 use actix_web::{
     get,post, middleware::Logger, web, App, HttpResponse, HttpServer, Responder, Result,HttpRequest
 };
@@ -14,12 +15,11 @@ mod backgroundtask;
 use backgroundtask::BackgroundActor;
 pub mod db;
 use db::{
-    sea_orm::{self, sea_query::IntoCondition, EntityTrait, QuerySelect, RelationTrait},
+    sea_orm::{self, sea_query::IntoCondition, EntityTrait, QuerySelect, RelationTrait,ActiveModelTrait},
     tempsessions, users,
 };
 use futures::StreamExt;
-use actix_web::{error, ResponseError};
-use std::fs::File;
+use actix_web::{error};
 use log::{error, info};
 use futures::executor::block_on;
 use macros;
@@ -31,26 +31,12 @@ pub const MOCK_SERVER_URL: &str = "http://127.0.0.1:5376";
 async fn trips(data: web::Data<AppData>, session: Session) -> Result<impl Responder> {
     Ok(HttpResponse::Ok().finish())
 }
-fn to_response_error(err: web_push::WebPushError)->actix_web::error::Error{
-    let str=match err{
-        web_push::WebPushError::BadRequest(s) => {
-            "BadRequest".to_owned()+s.unwrap_or("No request".to_string()).as_str()
 
-        },
-        web_push::WebPushError::ServerError(s) => {
-            "BadRequest".to_owned()+s.unwrap_or(std::time::Duration::new(0, 0)).as_millis().to_string().as_str()+" miliseconds"
-        },
-        web_push::WebPushError::Other(s) => {
-            "Other ".to_string()+s.as_str()
-        },
-        s=>{
-            s.to_string()
-        }
-    };
-    error::ErrorInternalServerError(str)
-}
+
+#[macros::restricted_route]
 #[post("/registerNotifier")]
-async fn registerNotifier(data: web::Data<AppData>,mut payload: web::Payload) -> Result<impl Responder>{
+async fn register_notifier(data: web::Data<AppData>,mut payload: web::Payload, session: Session) -> Result<impl Responder>{
+    
     println!("HELLO FROM NOTIFICATIONS");
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
@@ -71,15 +57,27 @@ async fn registerNotifier(data: web::Data<AppData>,mut payload: web::Payload) ->
             return Err(error::ErrorBadRequest("Invalid json"));
         }
     };
-    Ok("hello")
+    let notification_info=db::notification_info::ActiveModel{
+        UserId:sea_orm::ActiveValue::Set(user.id),
+        endpoint:sea_orm::ActiveValue::Set(subscription_info.endpoint),
+        auth:sea_orm::ActiveValue::Set(subscription_info.keys.auth),
+        p256dh:sea_orm::ActiveValue::Set(subscription_info.keys.p256dh),
+        ..Default::default()
+    };
+    let res=notification_info.insert(&data.data_base).await;
+    if let Err(_)= res{
+        return Err(ErrorInternalServerError("Database error"));
+    };
+    Ok(HttpResponse::Ok().finish())
 }
 
 #[get("/checkheaders")]
-async fn checkheaders(data: web::Data<AppData>, session: Session,req: HttpRequest)->Result<impl Responder>{
-    match req.cookie("id") {
+async fn checkheaders(req: HttpRequest)->Result<impl Responder>{
+    let cookies=match req.cookie("id") {
         Some(cookie) => format!("Cookie: {}", cookie.value()),
         None => "No cookie found".to_string(),
-    }
+    };
+    info!("{}",cookies);
     Ok("")
 }
 pub const MAX_PAYLOAD_SIZE: usize = 262_144;
@@ -127,7 +125,7 @@ async fn main() -> std::io::Result<()> {
             .service(checkheaders)
             .service(trips)
             .service(Files::new("/static", "./static").prefer_utf8(true))
-            .service(registerNotifier)
+            .service(register_notifier)
     })
     .bind("127.0.0.1:5377")?
     .run();

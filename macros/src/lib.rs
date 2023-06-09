@@ -2,7 +2,6 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use quote;
 use quote::ToTokens;
 use std::collections::HashSet;
 use syn::fold;
@@ -29,11 +28,9 @@ impl Args {
         match *e {
             Expr::Path(ref e) => {
                 // variable shouldn't start wiht ::
-                if e.path.leading_colon.is_some() {
+                if e.path.leading_colon.is_some() || e.path.segments.len() != 1 {
                     false
                 // should be a single variable like `x=8` not n::x=0
-                } else if e.path.segments.len() != 1 {
-                    false
                 } else {
                     // get the first part
                     let first = e.path.segments.first().unwrap();
@@ -183,12 +180,12 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
             Type::Path(syn::TypePath { path, .. }) => {
                 if let Some(ident) = path.segments.last() {
                     if let syn::PathArguments::AngleBracketed(args) = &ident.arguments {
-                        if let Some(arg) = args.args.first() {
-                            if let syn::GenericArgument::Type(Type::Path(type_path)) = arg {
-                                if let Some(ident) = type_path.path.segments.last() {
-                                    if ident.ident == "AppData" {
-                                        return Some(pat.clone());
-                                    }
+                        if let Some(syn::GenericArgument::Type(Type::Path(type_path))) =
+                            args.args.first()
+                        {
+                            if let Some(ident) = type_path.path.segments.last() {
+                                if ident.ident == "AppData" {
+                                    return Some(pat.clone());
                                 }
                             }
                         }

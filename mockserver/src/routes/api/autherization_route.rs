@@ -12,7 +12,6 @@ use db::{
     tempsessions, users, TempSession, Users,
 };
 use futures::StreamExt;
-use log::debug;
 use log::error;
 use serde::{Deserialize, Serialize};
 

@@ -21,8 +21,9 @@ impl NotificationAction {
         }
     }
 }
+/// this struct is a Rust implementation for the options https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification 
 #[derive(Serialize)]
-pub struct NotificationOptions {
+struct NotificationOptions {
     body: Option<String>,
     icon: Option<String>,
     image: Option<String>,
@@ -49,91 +50,110 @@ impl NotificationOptions {
             action: None,
         }
     }
-    fn add_body(&mut self,body:String){
-        self.body=Some(body);
+    /// the body to be used
+    fn add_body(&mut self, body: String) {
+        self.body = Some(body);
     }
-    fn add_icon(&mut self,icon:String){
-        self.icon=Some(icon);
+    fn add_icon(&mut self, icon: String) {
+        self.icon = Some(icon);
     }
-    fn add_image(&mut self,image:String){
-        self.image=Some(image);
+    fn add_image(&mut self, image: String) {
+        self.image = Some(image);
     }
-    fn add_badge(&mut self,badge:String){
-        self.badge=Some(badge);
+    fn add_badge(&mut self, badge: String) {
+        self.badge = Some(badge);
     }
-    fn add_timestamp(&mut self,timestamp:i64){
-        self.timestamp=Some(timestamp);
+    fn add_timestamp(&mut self, timestamp: i64) {
+        self.timestamp = Some(timestamp);
     }
-    fn add_tag(&mut self,tag:String){
-        self.tag=Some(tag);
+    fn add_tag(&mut self, tag: String) {
+        self.tag = Some(tag);
     }
-    fn add_data(&mut self,data:String){
-        self.data=Some(data);
+    fn add_data(&mut self, data: String) {
+        self.data = Some(data);
     }
-    fn add_vibrate(&mut self,vibrate:Vec<u64>){
-        self.vibrate=Some(vibrate);
+    fn add_vibrate(&mut self, vibrate: Vec<u64>) {
+        self.vibrate = Some(vibrate);
     }
-    fn add_renotify(&mut self,renotify:bool){
-        self.renotify=Some(renotify);
+    fn renotify(&mut self, renotify: bool) {
+        self.renotify = Some(renotify);
     }
-    fn add_action(&mut self,action:NotificationAction){
-        if self.action.is_none(){
-            self.action=Some(Vec::new())
+    fn add_action(&mut self, action: NotificationAction) {
+        if self.action.is_none() {
+            self.action = Some(Vec::new())
         }
         if let Some(ref mut v) = self.action {
             v.push(action);
         }
     }
 }
+/// this struct is a Rust implementation for the 
+/// [notification api](https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification)
+/// and in js it should later be resived as <br>
+/// ``` js
+/// self.addEventListener('push', function(event) {
+/// let not=event.data.json();
+/// const promiseChain = self.registration.showNotification(not.title,not.options)
+/// event.waitUntil(promiseChain);
+/// });
+/// ```
+/// is not Deserialize as it shold not be resived
 #[derive(Serialize)]
 pub struct Notification {
     title: String,
     options: NotificationOptions,
 }
-impl Notification{
-    fn new(title:String)->Self{
-        Self{
+impl Notification {
+    pub fn new(title: String) -> Self {
+        Self {
             title,
-            options:NotificationOptions::new()
+            options: NotificationOptions::new(),
         }
     }
-    fn add_body(&mut self,body:String){
-        self.options.body=Some(body);
+    pub fn add_body(mut self, body: String)->Self {
+        self.options.add_body(body);
+        self
     }
-    fn add_icon(&mut self,icon:String){
-        self.options.icon=Some(icon);
+    pub fn add_icon(mut self, icon: String)->Self {
+        self.options.add_icon(icon);
+        self
     }
-    fn add_image(&mut self,image:String){
-        self.options.image=Some(image);
+    pub fn add_image(mut self, image: String)->Self {
+        self.options.add_image(image);
+        self
     }
-    fn add_badge(&mut self,badge:String){
-        self.options.badge=Some(badge);
+    pub fn add_badge(mut self, badge: String)->Self {
+        self.options.add_badge(badge);
+        self
     }
-    fn add_timestamp(&mut self,timestamp:i64){
-        self.options.timestamp=Some(timestamp);
+    pub fn add_timestamp(mut self, timestamp: i64)->Self {
+        self.options.add_timestamp(timestamp);
+        self
     }
-    fn add_tag(&mut self,tag:String){
-        self.options.tag=Some(tag);
+    fn add_tag(mut self, tag: String)->Self {
+        self.options.add_tag(tag);
+        self
     }
-    fn add_data(&mut self,data:String){
-        self.options.data=Some(data);
+    fn add_data(mut self, data: String)->Self {
+        self.options.add_data(data);
+        self
     }
-    fn add_vibrate(&mut self,vibrate:Vec<u64>){
-        self.options.vibrate=Some(vibrate);
+    fn add_vibrate(mut self, vibrate: Vec<u64>)->Self {
+        self.options.add_vibrate(vibrate);
+        self
     }
-    fn add_renotify(&mut self,renotify:bool){
-        self.options.renotify=Some(renotify);
+    fn renotify(mut self, renotify: bool)->Self {
+        self.options.renotify(renotify);
+        self
     }
-    fn add_action(&mut self,action:NotificationAction){
-        if self.options.action.is_none(){
-            self.options.action=Some(Vec::new())
-        }
-        if let Some(ref mut v) = self.options.action {
-            v.push(action);
-        }
+    fn add_action(mut self, action: NotificationAction)->Self {
+        self.options.add_action(action);
+        self
     }
 }
 
+/// sends the notification usint the subscription_info 
+/// will return error if it fails
 pub async fn sendNotification(
     subscription_info: web_push::SubscriptionInfo,
     notification: Notification,

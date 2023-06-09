@@ -75,10 +75,10 @@ impl FromStr for Company {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Address {
     id: String,
-    address: String,
+    pub address: String,
 }
 
-#[derive(Serialize, Deserialize, Debug,Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug,Clone, Copy,PartialEq, Eq)]
 pub enum ReservationStatusEnum {
     ResaBesäld,
     BilPåväg,
@@ -150,7 +150,7 @@ impl Departure {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug,Clone)]
 
 pub struct Trips {
     pub id: String,

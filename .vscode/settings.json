@@ -134,6 +134,8 @@
     "css.validate": false,
     "rust-analyzer.linkedProjects": [
         "./server/Cargo.toml",
-        "./app/Cargo.toml"
+        "./app/Cargo.toml",
+        "./server/Cargo.toml"
     ],
+    "rust-analyzer.check.command": "clippy"
 }

@@ -1,10 +1,11 @@
 #![allow(non_snake_case)] //beacuse needs serialzieble to json with CamelCaseNames :)
-use chrono::{TimeZone, Utc,Duration};
+
+use chrono::{TimeZone, Utc,Duration, DateTime};
 use crate::db as db;
 use db::{
     resor,
     sea_orm::{
-        query, Condition, DbBackend, EntityTrait, QueryFilter, QueryOrder, QuerySelect, Select,
+        Condition, DbBackend, EntityTrait, QueryFilter, QueryOrder, QuerySelect, Select,
     },
     users,
 };
@@ -36,7 +37,7 @@ impl FromStr for Transport {
         }
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug,Clone)]
 enum Company {
     TaxiKurir,
     ArlandaExpress,
@@ -94,16 +95,18 @@ impl Address {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-enum ReservationStatusEnum {
+#[derive(Serialize, Deserialize, Debug,Clone,PartialEq, Eq)]
+pub enum ReservationStatusEnum {
     ResaBesäld,
     BilPåväg,
+    LetarEfterBil
 }
 impl ToString for ReservationStatusEnum {
     fn to_string(&self) -> String {
         match self {
             Self::ResaBesäld => String::from("Resa Bestäld"),
             Self::BilPåväg => String::from("Bil Påväg"),
+            Self::LetarEfterBil=> String::from("Letar efter bil")
         }
     }
 }
@@ -117,9 +120,9 @@ impl FromStr for ReservationStatusEnum {
         }
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
-struct ReservationStatus {
-    status: ReservationStatusEnum,
+#[derive(Serialize, Deserialize, Debug,Clone)]
+pub struct ReservationStatus {
+    pub status: ReservationStatusEnum,
 }
 fn is_none_or_empty(op: &Option<String>) -> bool {
     !match op {
@@ -127,18 +130,18 @@ fn is_none_or_empty(op: &Option<String>) -> bool {
         None => false,
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
-struct CustomerInfo {
+#[derive(Serialize, Deserialize, Debug,Clone)]
+pub struct CustomerInfo {
     phoneNumber: String,
     #[serde(skip_serializing_if = "is_none_or_empty")]
     notes: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     hasReservationStatus: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    reservationStatus: Option<ReservationStatus>,
+    pub reservationStatus: Option<ReservationStatus>,
 }
-#[derive(Serialize, Deserialize, Debug)]
-struct Departure {
+#[derive(Serialize, Deserialize, Debug,Clone)]
+pub struct Departure {
     id: String,
     transport: Transport,
     transportProvider: Option<Company>,
@@ -152,9 +155,17 @@ struct Departure {
     #[serde(skip_serializing_if = "Option::is_none")]
     by: Option<Address>,
     to: Address,
-    customerInfo: CustomerInfo,
+    pub customerInfo: CustomerInfo,
 }
 impl Departure {
+    pub fn get_time(&self)->Option<DateTime<Utc>>{
+        DateTime::from_str(&self.departure).ok()
+    }
+    pub fn set_status(&mut self,s:ReservationStatus){
+        self.customerInfo.reservationStatus=Some(s);
+        self.customerInfo.hasReservationStatus=Some(true);
+    }
+    #[allow(clippy::too_many_arguments)]
     fn new(
         id: String,
         transport_string: String,
@@ -194,7 +205,7 @@ impl Departure {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug,Clone)]
 
 pub struct Trips {
     id: String,
@@ -209,7 +220,7 @@ pub struct Trips {
     from: Address,
     by: Option<Address>,
     to: Address,
-    departure: Departure,
+    pub departure: Departure,
     passengers: i32,
     childPassengers: i32,
     attributes: Vec<String>,
@@ -280,7 +291,7 @@ impl Trips {
             notes,
             resor.id.to_string(),
             vec![transport.clone()],
-            transport.clone(),
+            transport,
             from,
             by,
             to,
@@ -294,6 +305,7 @@ impl Trips {
             resor.cancelleable,
         ))
     }
+    #[allow(clippy::too_many_arguments)]
     fn new(
         id: String,
         customerName: String,
@@ -346,7 +358,7 @@ pub struct TripsRequest {
     skip: i32,
     take: i32,
     remaining: Option<i32>,
-    customerTransportReservation: Option<Vec<Trips>>,
+    pub customerTransportReservation: Option<Vec<Trips>>,
 }
 impl TripsRequest {
     pub fn addTrips(

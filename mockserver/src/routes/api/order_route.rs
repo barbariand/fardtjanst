@@ -86,7 +86,7 @@ async fn order(
         status: Set(None),
     };
     match Resor::insert(insertresa).exec(data.get_db()).await {
-        Ok(_) => return Ok(HttpResponse::Ok().finish()),
-        Err(_) => {return Ok(HttpResponse::InternalServerError().finish())}
-    };
+        Ok(_) => Ok(HttpResponse::Ok().finish()),
+        Err(_) => {Ok(HttpResponse::InternalServerError().finish())}
+    }
 }

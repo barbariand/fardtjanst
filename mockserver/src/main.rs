@@ -1,6 +1,5 @@
 #![feature(test)]
 extern crate test;
-use actix_rt;
 use actix_session::{
     config::{PersistentSession, SessionLifecycle},
     storage::CookieSessionStore,
@@ -24,7 +23,7 @@ impl AppData {
     }
     fn new(data_base: db::DatabaseConnection) -> AppData {
         AppData {
-            data_base: data_base,
+            data_base,
         }
     }
 }
