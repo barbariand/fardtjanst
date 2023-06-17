@@ -14,4 +14,4 @@ backend = "http://localhost:5377/static/"
 
 [[proxy]]
 rewrite = "/api/"
-backend = "http://localhost:5377/"
+backend = "http://localhost:5377/api/"

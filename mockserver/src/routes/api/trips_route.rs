@@ -37,14 +37,14 @@ pub(crate) async fn trips(
         Ok(s) => s,
         Err(e) => return Ok(HttpResponse::InternalServerError().body(e)),
     };
-    if let Some(tripsvec)=&mut tr.customerTransportReservation{
-        for trip in tripsvec{
-            if let Some(time)=trip.departure.get_time(){
+    if let Some(trip_list)=&mut tr.customerTransportReservation{
+        for trip in trip_list{
+            if let Some(departure_time)=trip.departure.get_time(){
                 let after = Utc::now();
-                let time_untill=after-time;
+                let time_untill=after-departure_time;
                 if time_untill<Duration::minutes(30)&&time_untill>Duration::minutes(-30){
-                    let idk=-time_untill.num_seconds()+30*60;
-                    if (rand::random::<f64>()*60.0*60.0)>idk as f64||trip.departure.customerInfo.reservationStatus.as_ref().is_some_and(|v|{v.status==ReservationStatusEnum::BilPåväg}){
+                    let adjusted_seconds_until_departure=-time_untill.num_seconds()+30*60;
+                    if (rand::random::<f64>()*60.0*60.0)>adjusted_seconds_until_departure as f64||trip.departure.customerInfo.reservationStatus.as_ref().is_some_and(|v|{v.status==ReservationStatusEnum::BilPåväg}){
                         trip.departure.set_status(ReservationStatus{status:ReservationStatusEnum::BilPåväg});
                     }else{
                         trip.departure.set_status(ReservationStatus{status:ReservationStatusEnum::LetarEfterBil});

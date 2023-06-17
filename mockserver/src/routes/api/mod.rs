@@ -1,6 +1,8 @@
 mod autherization_route;
 mod order_route;
 mod trips_route;
+mod remove_route;
+pub use remove_route::remove;
 pub use autherization_route::autherization;
 pub use trips_route::trips;
 pub mod tripsSerilizing;

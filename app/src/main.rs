@@ -1,6 +1,7 @@
-use app::*;
-use leptos::view;
+
+pub mod api;
+use client::*;
+use leptos::*;
 fn main() {
-    use leptos::mount_to_body;
-    mount_to_body(|cx| view! { cx,  <Start /> })
+    mount_to_body(|cx| view! { cx,  <Start/>})
 }

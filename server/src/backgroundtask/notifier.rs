@@ -1,10 +1,11 @@
 
+
 use serde::Serialize;
 use serde_json;
 use std::fs::File;
 use web_push;
 //Actions still need a
-#[derive(Serialize)]
+#[derive(Serialize,Debug,Clone)]
 pub struct NotificationAction {
     action: String,       //action name
     title: String,        //tiltle of action
@@ -21,7 +22,7 @@ impl NotificationAction {
     }
 }
 /// this struct is a Rust implementation for the options https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification 
-#[derive(Serialize)]
+#[derive(Serialize,Debug,Clone)]
 struct NotificationOptions {
     body: Option<String>,
     icon: Option<String>,
@@ -98,7 +99,7 @@ impl NotificationOptions {
 /// });
 /// ```
 /// is not Deserialize as it shold not be resived
-#[derive(Serialize)]
+#[derive(Serialize,Debug,Clone)]
 pub struct Notification {
     title: String,
     options: NotificationOptions,
@@ -157,7 +158,7 @@ impl Notification {
 /// will return error if it fails
 pub async fn send_notification(
     subscription_info: web_push::SubscriptionInfo,
-    notification: Notification,
+    notification: &Notification,
 ) -> Result<(), web_push::WebPushError> {
     //Read signing material for payload.
     let file = File::open("private_key.pem").unwrap();
