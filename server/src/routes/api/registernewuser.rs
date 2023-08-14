@@ -12,6 +12,7 @@ use db::{
 use futures::StreamExt;
 use log::error;
 use super::{User,RequestError};
+#[post("/api/registeruser")]
 async fn register_user(
     data: web::Data<AppData>,
     session: Session,
@@ -39,12 +40,12 @@ async fn register_user(
             return Err(error::ErrorBadRequest("Invalid json"));
         }
     };
-    if let Err(e)=super::execute_request_for(user, reqwest::Method::POST, MOCK_SERVER_URL.to_string()+"/").await{
+    if let Err(e)=super::execute_request_for(user, reqwest::Method::POST, MOCK_SERVER_URL.to_string()+"/api/autherization").await{
         match e{
-            RequestError::Reqwest(_) => todo!(),
-            RequestError::SerdeJson(_) => Ok(HttpResponse::ServiceUnavailable()),
-            RequestError::Header => Ok(HttpResponse::BadGateway()),
-        }
-    }
-    Ok("not implimented")
+            RequestError::Reqwest(_) => return Ok(HttpResponse::ServiceUnavailable()),
+            RequestError::SerdeJson(_) => return Ok(HttpResponse::ServiceUnavailable()),
+            RequestError::Header => return Ok(HttpResponse::BadGateway()),
+        };
+    };
+    Ok(HttpResponse::Ok())
 }

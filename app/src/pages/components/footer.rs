@@ -13,8 +13,7 @@ pub fn Footer(cx: Scope) -> impl IntoView {
         cx,
         styles=styles,
         <footer>
-            "Made by Dante Nilsson, contact on mail dante.a.nilsson+fardtjanstnotifikation@gmail.com"
-            
+            "Made by Dante Nilsson, contact on mail dante.a.nilsson+bättrefärdtjänst@gmail.com"
         </footer>
     }
 }

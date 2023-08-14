@@ -30,7 +30,7 @@ pub fn CredentialsForm(
             <input
                 type="number"
                 required
-                placeholder="username"
+                placeholder="kort nummer"
                 prop:disabled=move || disabled.get()
                 on:keyup=move |ev: ev::KeyboardEvent| {
                     let val = event_target_value(&ev);

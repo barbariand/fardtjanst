@@ -1,14 +1,11 @@
 mod autherization_route;
 mod order_route;
 mod registernewuser;
-use std::ops::Deref;
 
 use crate::MOCK_SERVER_URL;
-use actix_web::http::header;
 pub use autherization_route::autherization;
-use futures_util::Future;
 pub use registernewuser::register_user;
-use reqwest::{Client, IntoUrl, RequestBuilder, Response};
+use reqwest::{IntoUrl, RequestBuilder};
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct User {
@@ -31,6 +28,7 @@ impl From<serde_json::Error> for RequestError {
         RequestError::SerdeJson(value)
     }
 }
+
 pub async fn execute_request_for<U>(
     user: User,
     method: reqwest::Method,
