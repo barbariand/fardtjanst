@@ -34,16 +34,15 @@ pub fn CredentialsForm(
                 prop:disabled=move || disabled.get()
                 on:keyup=move |ev: ev::KeyboardEvent| {
                     let val = event_target_value(&ev);
-                    match val.parse::<usize>(){
-                        Ok(value)=>set_email.update(|v| *v = value),
-                        Err(_)=>{}
+                    if let Ok(value)= val.parse::<usize>(){
+                        set_email.update(|v| *v = value);
+                        
                     }
                 }
                 on:change=move |ev| {
                     let val = event_target_value(&ev);
-                    match val.parse::<usize>(){
-                        Ok(value)=>set_email.update(|v| *v = value),
-                        Err(_)=>{}
+                    if let Ok(value)= val.parse::<usize>(){
+                        set_email.update(|v| *v = value);
                     }
                 }
             />

@@ -2,6 +2,8 @@ use gloo_net::http::{Request, Response};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+mod trips;
+pub use trips::*;
 #[derive(Serialize, Deserialize)]
 pub struct Credentials {
     pub username: usize,
@@ -11,6 +13,7 @@ pub struct Credentials {
 pub struct UserInfo {
     pub name: String,
 }
+
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ApiToken {
@@ -58,14 +61,14 @@ impl AuthorizedApi {
         Self { url, token }
     }
     fn auth_header_value(&self) -> String {
-        format!("Bearer {}", self.token.token)
+        format!("{}", self.token.token)
     }
     async fn send<T>(&self, req: Request) -> Result<T>
     where
         T: DeserializeOwned,
     {
         let response = req
-            .header("Authorization", &self.auth_header_value())
+            .header("id", &self.auth_header_value())
             .send()
             .await?;
         into_json(response).await
@@ -75,6 +78,9 @@ impl AuthorizedApi {
         self.send(Request::post(&url)).await
     }
     pub async fn user_info(&self) -> Result<UserInfo> {
+        let url = format!("{}/users", self.url);
+        self.send(Request::get(&url)).await
+    }pub async fn user_info(&self) -> Result<UserInfo> {
         let url = format!("{}/users", self.url);
         self.send(Request::get(&url)).await
     }

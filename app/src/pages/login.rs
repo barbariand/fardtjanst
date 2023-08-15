@@ -8,7 +8,7 @@ where
     F: Fn(api::AuthorizedApi) + 'static + Clone,
 {
     let styles = styled::style!(
-        p{
+        div{
             background-color:green;
         }
     );
@@ -35,18 +35,14 @@ where
                             }
                             api::Error::Api(err) => err.message,
                         };
-                        error!(
-                            "Unable to login with {}: {msg}",
-                            credentials.password
-                        );
                         set_login_error.update(|e| *e = Some(msg));
                     }
                 }
             }
     });
-    styled_macro::view! {
+    
+    view! {
         cx,
-        styles=styles,
-        <div>"hello"</div>
+        <div><NavBar></NavBar></div>
     }
 }

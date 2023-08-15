@@ -9,19 +9,16 @@ use actix_web::Responder;
 use actix_web::Result;
 use chrono::Utc;
 use db::{
-    resor,
+
     sea_orm::{
-        self, sea_query::IntoCondition, ActiveValue::Set, EntityTrait, QuerySelect, RelationTrait,
+        self, sea_query::IntoCondition, EntityTrait, QuerySelect, RelationTrait,
     },
     tempsessions, users, Resor,
 };
 use futures::StreamExt;
 use log::error;
 use macros;
-use sea_orm::prelude::ChronoDateTimeUtc;
 use serde::{Deserialize, Serialize};
-use std::time;
-use std::time::Duration;
 #[derive(Deserialize, Serialize)]
 struct Resa {
     pub id: i32,

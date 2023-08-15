@@ -7,9 +7,8 @@ use home::*;
 use leptos::*;
 use leptos_router::*;
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 pub enum Page {
-    #[default]
     Home,
     Login,
     Register,
@@ -19,8 +18,8 @@ impl Page {
     pub fn path(&self) -> &'static str {
         match self {
             Self::Home => "/",
-            Self::Login => "/login",
-            Self::Register => "/register",
+            Self::Login => "/api/autherization",
+            Self::Register => "/api/register",
         }
     }
 }

@@ -50,6 +50,8 @@ async fn main() -> std::io::Result<()> {
             .service(routes::api::trips)
             .service(routes::api::autherization)
             .service(routes::api::order)
+            .service(routes::api::remove)
+            .service(routes::api::profile)
     })
     .bind("127.0.0.1:5376")?
     .run()

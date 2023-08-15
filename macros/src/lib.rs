@@ -265,5 +265,6 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
         }
     };
     // Hand the output tokens back to the compiler
+    println!("{}",expanded);
     TokenStream::from(expanded)
 }

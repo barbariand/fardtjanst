@@ -1,17 +1,26 @@
+use super::{RequestError, User};
+use crate::db;
 use crate::{AppData, MAX_PAYLOAD_SIZE, MOCK_SERVER_URL};
 use actix_session::Session;
-use actix_web::{error, post, web};
-use actix_web::{HttpResponse, Responder,HttpRequest};
 use actix_web::Result;
-use std::fmt::Display;
-use crate::db;
+use actix_web::{error, post, web};
+use actix_web::{ HttpResponse, Responder};
 use db::{
     sea_orm::{ColumnTrait, EntityTrait, QueryFilter},
     tempsessions, users, TempSession, Users,
 };
 use futures::StreamExt;
 use log::error;
-use super::{User,RequestError};
+use sea_orm::ActiveValue;
+use serde::Deserialize;
+#[derive(Deserialize)]
+struct RegisterdUser{
+    pub name: String,
+    pub password: String,
+    pub card_nummer: i32,
+    pub phone_number: String,
+}
+#[post("/api/register")]
 async fn register_user(
     data: web::Data<AppData>,
     session: Session,
@@ -39,12 +48,40 @@ async fn register_user(
             return Err(error::ErrorBadRequest("Invalid json"));
         }
     };
-    if let Err(e)=super::execute_request_for(user, reqwest::Method::POST, MOCK_SERVER_URL.to_string()+"/").await{
-        match e{
-            RequestError::Reqwest(_) => todo!(),
-            RequestError::SerdeJson(_) => Ok(HttpResponse::ServiceUnavailable()),
-            RequestError::Header => Ok(HttpResponse::BadGateway()),
+    let res=match super::get_authorized_request(
+        user,
+        reqwest::Method::GET,
+        MOCK_SERVER_URL.to_string() + "/profile",
+    )
+    .await
+    {
+        Err(e) => {
+            return match e {
+                RequestError::Reqwest(_) => Ok(HttpResponse::ServiceUnavailable()),
+                RequestError::SerdeJson(_) => Ok(HttpResponse::ServiceUnavailable()),
+                RequestError::Header => Ok(HttpResponse::BadGateway()),
+            };
+        },
+        Ok(r)=>{
+            match r.send().await{
+                Ok(s)=>s,
+                Err(_)=>return Ok(HttpResponse::ServiceUnavailable()),
+            }
         }
-    }
-    Ok("not implimented")
+    };
+    let register_user=match res.json::<RegisterdUser>().await{
+        Err(e)=>{
+            return Ok(HttpResponse::BadGateway())
+        }
+        Ok(u)=>u,
+    };
+    let insert=users::ActiveModel{
+        card_nummer:ActiveValue::Set(register_user.card_nummer),
+        name:ActiveValue::Set(register_user.name),
+        password:ActiveValue::Set(register_user.password),
+        phone_number:ActiveValue::Set(register_user.phone_number),
+        ..Default::default()
+    };
+    Users::insert(insert).exec(data.get_db()).await.expect("db is down");
+    Ok(HttpResponse::Ok())
 }

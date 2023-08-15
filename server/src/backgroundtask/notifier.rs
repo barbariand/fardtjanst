@@ -1,9 +1,14 @@
 
-
+use log::error;
+use actix::{Message, Handler};
 use serde::Serialize;
 use serde_json;
 use std::fs::File;
 use web_push;
+use actix::AsyncContext;
+use crate::db::notification_info;
+
+use super::notification_actor::NotificationActor;
 //Actions still need a
 #[derive(Serialize,Debug,Clone)]
 pub struct NotificationAction {
@@ -177,4 +182,38 @@ pub async fn send_notification(
     //Finally, send the notification!
     client.send(builder.build()?).await?;
     Ok(())
+}
+pub struct SendNotification {
+    pub notification: Notification,
+    pub notification_info: notification_info::Model,
+}
+impl Message for SendNotification {
+    type Result = ();
+}
+
+
+impl Handler<SendNotification> for NotificationActor {
+    type Result = ();
+    fn handle(&mut self, msg: SendNotification, ctx: &mut Self::Context) -> Self::Result {
+        ctx.spawn(actix::fut::wrap_future::<_, Self>(async move {
+            if let Err(e) =
+                send_notification(msg.notification_info.clone().into(), &msg.notification)
+                    .await
+            {
+                use web_push::WebPushError::*;
+                match e {
+                    Unauthorized | InvalidUri | EndpointNotValid | EndpointNotFound => {
+                        // should be removed
+                    }
+                    BadRequest(s) => {
+                        error!("request failed beacuse: {:?}", s);
+                    }
+                    PayloadTooLarge => {
+                        error!("payload to big: {:?}", &msg.notification)
+                    }
+                    _ => {}
+                }
+            }
+        }));
+    }
 }

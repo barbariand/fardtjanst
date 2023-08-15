@@ -29,7 +29,6 @@ use db::{
 };
 use futures::executor::block_on;
 use futures::StreamExt;
-use futures_util::TryFutureExt;
 use log::{error, info};
 pub const MOCK_SERVER_URL: &str = "http://127.0.0.1:5376";
 
@@ -87,14 +86,15 @@ pub const MAX_PAYLOAD_SIZE: usize = 262_144;
 #[derive(Clone)]
 struct AppData {
     data_base: sea_orm::DatabaseConnection,
+    addr:actix::Addr<BackgroundActor>,
 }
 
 impl AppData {
     fn get_db(&self) -> &db::DatabaseConnection {
         &self.data_base
     }
-    fn new(data_base: db::DatabaseConnection) -> AppData {
-        AppData { data_base }
+    fn new(data_base: db::DatabaseConnection, addr:actix::Addr<BackgroundActor>) -> AppData {
+        AppData { data_base ,addr}
     }
 }
 #[actix::main]
@@ -104,8 +104,10 @@ async fn main() -> std::io::Result<()> {
     let data_base = block_on(db::getdb()).expect("failed to create connection to db");
     std::env::set_var("RUST_LOG", "debug");
     pretty_env_logger::init();
-
-    let app_data = AppData::new(data_base.clone());
+    let bg = BackgroundActor::new(data_base.clone());
+    let addr: actix::Addr<BackgroundActor>=bg.start();
+    
+    let app_data = AppData::new(data_base.clone(),addr);
     let server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_data.clone()))
@@ -125,16 +127,6 @@ async fn main() -> std::io::Result<()> {
     })
     .bind("127.0.0.1:5377")?
     .run();
-
-    
-    let bg = BackgroundActor::new(data_base);
-    let bgfut=async {
-        bg.start();
-    };
-    let a=Arbiter::new();
-    a.spawn_fn(|| {
-        block_on(bgfut)
-    });
     let serverarbiter = Arbiter::new();
     serverarbiter.spawn_fn(move || block_on(async { server.await.unwrap() }));
     // Use tokio::select to handle whichever future completes first.
