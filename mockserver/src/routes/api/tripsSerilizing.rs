@@ -97,14 +97,14 @@ impl Address {
 
 #[derive(Serialize, Deserialize, Debug,Clone,PartialEq, Eq)]
 pub enum ReservationStatusEnum {
-    ResaBesäld,
+    ResaBestäld,
     BilPåväg,
     LetarEfterBil
 }
 impl ToString for ReservationStatusEnum {
     fn to_string(&self) -> String {
         match self {
-            Self::ResaBesäld => String::from("Resa Bestäld"),
+            Self::ResaBestäld => String::from("Resa Bestäld"),
             Self::BilPåväg => String::from("Bil Påväg"),
             Self::LetarEfterBil=> String::from("Letar efter bil")
         }
@@ -114,7 +114,7 @@ impl FromStr for ReservationStatusEnum {
     type Err = ();
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
-            "Resa Beställd" => Ok(Self::ResaBesäld),
+            "Resa Beställd" => Ok(Self::ResaBestäld),
             "Bil påväg" => Ok(Self::BilPåväg),
             _ => Err(()),
         }
@@ -348,8 +348,11 @@ impl Trips {
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TripsRequest {
+    #[serde(default = "String::new")]
     group: String,
+    #[serde(default = "String::new")]
     sortOrder: String,
+    #[serde(default = "String::new")]
     filter: String,
     skip: i32,
     take: i32,
@@ -387,7 +390,7 @@ impl TripsRequest {
             "ToAddress"=> query.order_by_asc(resor::Column::ToAddres),
             _=>query.order_by_asc(resor::Column::Time),
         };
-        let time = Utc::now().checked_sub_signed(Duration::hours(1)).expect("shoukd be able to add 1 hour").timestamp();
+        let time = Utc::now().checked_sub_signed(Duration::hours(1)).expect("should be able to add 1 hour").timestamp();
         query = match self.group.as_str() {
             "Historical" => query.filter(Condition::any().add(resor::Column::Time.gte(time))),
             _ => query.filter(Condition::any().add(resor::Column::Time.lte(time))),
