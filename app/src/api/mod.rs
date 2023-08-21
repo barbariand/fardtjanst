@@ -1,14 +1,13 @@
-use gloo_net::http::{Request, Response};
+use api_structs::*;
+use gloo_net::http::{Request, Response, RequestBuilder};
+use gloo_storage::LocalStorage;
 use serde::de::DeserializeOwned;
+use wasm_bindgen::prelude::*;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-mod trips;
-pub use trips::*;
-#[derive(Serialize, Deserialize)]
-pub struct Credentials {
-    pub username: usize,
-    pub password: String,
-}
+use leptos::*;
+use gloo_storage::Storage;
+use crate::API_TOKEN_STORAGE_KEY;
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UserInfo {
     pub name: String,
@@ -43,16 +42,21 @@ impl UnauthorizedApi {
     pub const fn new(url: &'static str) -> Self {
         Self { url }
     }
-    pub async fn register(&self, credentials: &Credentials) -> Result<()> {
+    pub async fn register(&self, credentials: &User) -> Result<()> {
         let url = format!("{}/users", self.url);
         let response = Request::post(&url).json(credentials)?.send().await?;
         into_json(response).await
     }
-    pub async fn login(&self, credentials: &Credentials) -> Result<AuthorizedApi> {
+    pub async fn login(&self, credentials: &User) -> Result<AuthorizedApi> {
         let url = format!("{}/login", self.url);
         let response = Request::post(&url).json(credentials)?.send().await?;
-        let token = ApiToken::new(response.headers().get("id").ok_or(ApiError{message:String::from("could not find cookie")})?);
-        Ok(AuthorizedApi::new(self.url, token))
+        if response.status()==401{
+            Err(ApiError{message:String::from("username or password is incorrect")})?
+        }
+        let html_document = web_sys::window().unwrap().document().unwrap().dyn_into::<web_sys::HtmlDocument>().unwrap();
+        log!("{:?}",html_document.cookie().unwrap());
+        let token = html_document.cookie().unwrap();
+        Ok(AuthorizedApi::new(self.url, ApiToken { token }))
     }
 }
 
@@ -63,26 +67,32 @@ impl AuthorizedApi {
     fn auth_header_value(&self) -> String {
         format!("{}", self.token.token)
     }
-    async fn send<T>(&self, req: Request) -> Result<T>
+    async fn send(&self,req:RequestBuilder)->Result<Response>{
+        req
+            .header("id", &self.auth_header_value())
+            .send()
+            .await.map_err(Error::Fetch)
+    }
+    async fn send_expect_json<T>(&self, req: RequestBuilder) -> Result<T>
     where
         T: DeserializeOwned,
     {
-        let response = req
-            .header("id", &self.auth_header_value())
-            .send()
-            .await?;
-        into_json(response).await
+        into_json(self.send(req).await?).await
     }
     pub async fn logout(&self) -> Result<()> {
+        
         let url = format!("{}/logout", self.url);
-        self.send(Request::post(&url)).await
+        LocalStorage::delete(API_TOKEN_STORAGE_KEY);
+        self.send(Request::post(&url)).await?;
+        Ok(())
     }
     pub async fn user_info(&self) -> Result<UserInfo> {
         let url = format!("{}/users", self.url);
-        self.send(Request::get(&url)).await
-    }pub async fn user_info(&self) -> Result<UserInfo> {
-        let url = format!("{}/users", self.url);
-        self.send(Request::get(&url)).await
+        self.send_expect_json(Request::get(&url)).await
+    }
+    pub async fn trips(&self) -> Result<TripsRequest> {
+        let url = format!("{}/trips", self.url);
+        self.send_expect_json(Request::get(&url)).await
     }
     pub fn token(&self) -> &ApiToken {
         &self.token

@@ -23,7 +23,6 @@ use std::{
 use super::errors::BackgroundTaskError;
 use super::notification_actor::NotificationActor;
 use super::notifier::SendNotification;
-use super::order_actor;
 use super::order_actor::Order;
 use super::order_actor::OrderActor;
 use super::user_actor::UserActor;
@@ -46,7 +45,7 @@ impl BackgroundActor {
         let duration_to_sleep = Duration::from_secs(30 * 60);
         let loops: u64 = duration_to_sleep.as_secs() / sleep_duration.as_secs();
         let not_addr=NotificationActor {}.start();
-        let order_actor=OrderActor {data_base:data_base.clone().to_owned(),notification_actor:not_addr.clone()};
+        let order_actor=OrderActor {data_base:data_base.to_owned(),notification_actor:not_addr.clone()};
         BackgroundActor {
             data_base,
             running: Arc::new(AtomicBool::new(true)),
@@ -62,9 +61,8 @@ impl BackgroundActor {
         #![allow(clippy::await_holding_lock)] // this warning is fine beacuse we drop it later as repsonible programers
         let mut i = self.i.lock().unwrap();
         *i = (*i + 1) % self.maxloops;
-        info!("loop: {}", *i);
+
         if *i == 1 {
-            drop(i); // droped here as it is no longer needed
             if let Err(err) = self.handle_users().await {
                 error!("Error opening DB: {}", err)
             }
@@ -129,7 +127,7 @@ impl Handler<SendNotification> for BackgroundActor {
 }
 impl Handler<Order> for BackgroundActor{
     type Result = ();
-    fn handle(&mut self, msg: Order, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: Order, _: &mut Self::Context) -> Self::Result {
         self.order_actor.send(msg);
     }
 }

@@ -1,12 +1,8 @@
-mod components;
-use components::*;
+
 mod login;
 pub use login::*;
 mod home;
-use home::*;
-use leptos::*;
-use leptos_router::*;
-
+pub use home::*;
 #[derive(Debug, Clone, Copy)]
 pub enum Page {
     Home,
@@ -16,10 +12,11 @@ pub enum Page {
 
 impl Page {
     pub fn path(&self) -> &'static str {
+        
         match self {
             Self::Home => "/",
-            Self::Login => "/api/autherization",
-            Self::Register => "/api/register",
+            Self::Login => "/login",
+            Self::Register => "/register",
         }
     }
 }

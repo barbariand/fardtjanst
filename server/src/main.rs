@@ -1,5 +1,4 @@
 #![feature(let_chains)]
-#![feature(drain_filter)]
 #![feature(lint_reasons)]
 use core::panic;
 
@@ -32,11 +31,6 @@ use futures::StreamExt;
 use log::{error, info};
 pub const MOCK_SERVER_URL: &str = "http://127.0.0.1:5376";
 
-#[get("/trips")]
-#[macros::restricted_route]
-async fn trips(data: web::Data<AppData>, session: Session) -> Result<impl Responder> {
-    Ok(HttpResponse::Ok().finish())
-}
 
 #[macros::restricted_route]
 #[post("/registerNotifier")]
@@ -71,16 +65,6 @@ async fn register_notifier(
         return Err(ErrorInternalServerError("Database error"));
     };
     Ok(HttpResponse::Ok().finish())
-}
-
-#[get("/checkheaders")]
-async fn checkheaders(req: HttpRequest) -> Result<impl Responder> {
-    let cookies = match req.cookie("id") {
-        Some(cookie) => format!("Cookie: {}", cookie.value()),
-        None => "No cookie found".to_string(),
-    };
-    info!("{}", cookies);
-    Ok("")
 }
 pub const MAX_PAYLOAD_SIZE: usize = 262_144;
 #[derive(Clone)]
@@ -119,11 +103,11 @@ async fn main() -> std::io::Result<()> {
                     ))
                     .build(),
             )
-            .service(checkheaders)
-            .service(trips)
+            .service(routes::api::trips::trips)
             .service(Files::new("/static", "./static").prefer_utf8(true))
             .service(register_notifier)
-            .service(routes::api::autherization)
+            .service(routes::api::login::login)
+            .service(routes::api::logout::logout)
     })
     .bind("127.0.0.1:5377")?
     .run();

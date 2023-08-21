@@ -1,37 +1,16 @@
-mod autherization_route;
-mod order_route;
+pub mod login;
+pub mod order;
 use std::string::ToString;
-mod registernewuser;
+pub mod registernewuser;
 use crate::{MOCK_SERVER_URL, db};
-use actix_http::Error;
-pub use autherization_route::autherization;
-pub use registernewuser::register_user;
 use reqwest::{ IntoUrl, RequestBuilder};
-use serde::{Deserialize, Serialize};
-#[derive(Serialize, Deserialize, Default, Debug,Clone)]
-pub struct User {
-    pub id:i32,
-    pub username: i32,
-    pub password: String,
-}
-pub trait IntoUser{
-    fn into_user(self) -> User;
-}
-
-impl IntoUser for User {
-    fn into_user(self) -> User {
-        User{
-            id:self.id,
-            password:self.password,
-            username:self.username,
-        }
-    }
-}
+pub mod trips;
+pub mod logout;
+use api_structs::{User,IntoUser};
 impl IntoUser for &db::users::Model{
     fn into_user(self) -> User {
         User{
-            id:self.id,
-            username:self.card_nummer,
+            username:self.name.clone(),
             password:self.password.clone(),
         }
     }

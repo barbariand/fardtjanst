@@ -73,7 +73,7 @@
                     "command": "workbench.action.terminal.sendSequence",
                     "args": {
                         //using trunk.exe beacuse installing trunk on wsl somehow installs the exe (i think)
-                        "text": "trunk watch\u000D" // \u000D is a return so it runs
+                        "text": "trunk serve\u000D" // \u000D is a return so it runs
                     }
                 }
             ]
@@ -143,5 +143,6 @@
         "./mockserver/Cargo.toml"
     ],
     "editor.hover.enabled": true,
-    "rust-analyzer.check.command": "clippy"
+    "rust-analyzer.check.command": "clippy",
+    "rust-analyzer.showUnlinkedFileNotification": false
 }

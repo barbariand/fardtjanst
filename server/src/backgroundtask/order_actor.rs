@@ -1,14 +1,15 @@
 use actix::fut::wrap_future;
 use actix::{Message, Actor, Context, Handler, Addr, AsyncContext};
+use chrono::{Utc, TimeZone};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use actix_web::web::Bytes;
-use actix::WrapFuture;
 use log::error;
 use crate::{MOCK_SERVER_URL, db::notification_info};
 use crate::db::NotificationInfo;
 use sea_orm::{EntityTrait, QueryFilter, ColumnTrait};
 use crate::routes::api::{get_authorized_request, RequestError};
+use api_structs::{User,IntoUser,Notification};
 
 use super::BackgroundActor;
 use super::{notification_actor::NotificationActor, notifier::{SendNotification, self}};
@@ -16,14 +17,16 @@ use super::{notification_actor::NotificationActor, notifier::{SendNotification, 
 pub struct Order{
     pub data:Bytes,
     pub tries:usize,
-    pub user:crate::routes::api::User,
+    pub user:User,
+    pub user_id:i32,
     pub background_actor:Addr<BackgroundActor>,
 }
 impl Order{
-    pub fn new(data:Bytes,user:impl crate::routes::api::IntoUser,background_actor:Addr<BackgroundActor>)->Self{
+    pub fn new(data:Bytes,user:impl IntoUser,background_actor:Addr<BackgroundActor>,userid:i32)->Self{
         Self{
             data,
             tries:0,
+            user_id:userid,
             user:user.into_user(),
             background_actor,
         }
@@ -48,14 +51,14 @@ struct Resa {
     pub from_addres: String,
 }
 const MAX_TRIES:usize=10;
-const SECONDS_BETWEEN_TRIES:i64=60;
+const SECONDS_BETWEEN_TRIES:u64=60;
 impl Handler<Order> for OrderActor {
     type Result = ();
 
     fn handle(&mut self, msg: Order, ctx: &mut Self::Context) {
         // Clone or copy necessary data
         let mut retry_msg=msg.clone();
-        let user_id = msg.user.id;
+        let user_id = msg.user_id;
         let data_base = self.data_base.clone();  // Assuming you can clone this
         let notification_actor = self.notification_actor.clone();
 
@@ -66,20 +69,32 @@ impl Handler<Order> for OrderActor {
                 Ok(r) => r.body(msg.data).send().await.map_err(RequestError::from),
                 Err(e) => Err(e),
             };
-            let mut notification = notifier::Notification::new("Färdtjänst Notifier".to_string())
+            let mut notification = Notification::new("Färdtjänst Notifier".to_string())
             .add_icon("https://fardtjansten.regionstockholm.se/Resources/img/ft_icon_iPad.png".to_string())
             .add_badge("https://fardtjansten.regionstockholm.se/Resources/img/ft_icon_iPad.png".to_string());
             match optinal_prosesed_request {
                 Ok(_r)=>{
-                    serde_json::from_slice::<Resa>(&retry_msg.data);
-                    notification=notification.add_body(format!("Resa bestäld från {} till {}, kl: {}",));
+                    match serde_json::from_slice::<Resa>(&retry_msg.data){
+                    Ok(resa)=>{
+                        let datetime = match Utc.timestamp_millis_opt(resa.time) {
+                            chrono::LocalResult::Ambiguous(a, _) => Some(a),
+                            chrono::LocalResult::None => None,
+                            chrono::LocalResult::Single(s) => Some(s),
+                        };
+                        // Formats the combined date and time with the specified format string.
+                        let time: Option<String> = datetime.map(|f| f.format("%Y-%m-%d %H:%M:%S").to_string());
+                        notification=notification.add_body(format!("Resa bestäld från {} till {}, kl: {:#?}",resa.from_addres,resa.to_addres,time));}
+                    Err(_e)=>{
+                        
+                    }
+                    }
                 }
                 Err(e)=>{
                     retry_msg.tries+=1;
                     if msg.tries>MAX_TRIES{
                         notification=notification.add_body("Kunde inte beställa färdtjänst resa".to_string());
                     }else {
-                        actix_rt::time::sleep(Duration::new(60,0)).await;
+                        actix_rt::time::sleep(Duration::new(SECONDS_BETWEEN_TRIES,0)).await;
                         msg.background_actor.send(retry_msg);
                         return;
                     }

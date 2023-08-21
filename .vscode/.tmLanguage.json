@@ -1,0 +1,19 @@
+{
+    "name": "Rust with CSS",
+    "scopeName": "source.rust",
+    "patterns": [
+        {
+            "begin": "style!\\(",
+            "end": "\\);",
+            "name": "source.css",
+            "patterns": [
+                {
+                    "include": "source.css"
+                }
+            ]
+        },
+        {
+            "include": "source.rust"
+        }
+    ]
+}

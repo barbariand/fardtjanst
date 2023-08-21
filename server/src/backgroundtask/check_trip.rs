@@ -3,7 +3,8 @@ use std::sync::Arc;
 use actix::{Addr, Message};
 
 use crate::db::{users,notification_info};
-use super::{tripsSerilizing::Trips,notification_actor::NotificationActor};
+use api_structs::Trips;
+use super::{notification_actor::NotificationActor};
 #[derive(Clone)]
 pub struct CheckOnItsWay {
     pub user: users::Model,

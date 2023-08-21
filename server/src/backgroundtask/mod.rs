@@ -7,19 +7,33 @@ mod user_actor;
 use log::info;
 use log::debug;
 use errors::BackgroundTaskError;
-use crate::routes::api::IntoUser;
+use serde::Deserialize;
+use serde::Serialize;
 use crate::db::users;
 pub mod notifier;
 pub use order_actor::Order;
+use api_structs::TripsRequest;
 pub use background_prosses::{BackgroundActor};
-mod tripsSerilizing;
-pub use tripsSerilizing::TripsRequest;
+trait IntoAuthUser{
+    fn into_auth_user(self)->AuthUser;
+}
+#[derive(Serialize, Deserialize, Debug, Default)]
+struct AuthUser {
+    username: i32,
+    password: String,
+}
+impl IntoAuthUser for &users::Model{
+    fn into_auth_user(self)->AuthUser {
+        AuthUser { username:self.card_nummer, password: self.password.clone() }
+    }
+}
+
 pub async fn get_trip_request(user: &users::Model) -> Result<TripsRequest, BackgroundTaskError> {
     let client = reqwest::Client::new();
     debug!("user: {:?}", user);
     let authresponse = client
         .post(crate::MOCK_SERVER_URL.to_owned() + "/api/autherization")
-        .json(&user.into_user())
+        .json(&user.into_auth_user())
         .send()
         .await?;
     info!("got code {}", authresponse.status());

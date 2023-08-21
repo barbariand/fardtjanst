@@ -7,6 +7,7 @@ pub fn Footer(cx: Scope) -> impl IntoView {
         footer {
             height:10%;
         }
+        
     );
 
     styled_macro::view! {
@@ -14,7 +15,6 @@ pub fn Footer(cx: Scope) -> impl IntoView {
         styles=styles,
         <footer>
             "Made by Dante Nilsson, contact on mail dante.a.nilsson+fardtjanstnotifikation@gmail.com"
-            
         </footer>
     }
 }

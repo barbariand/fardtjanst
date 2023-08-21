@@ -1,8 +1,11 @@
+#![feature(proc_macro_span)]
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
+use syn::Block;
+use syn::LitStr;
 use std::collections::HashSet;
 use syn::fold;
 use syn::fold::Fold;
@@ -225,7 +228,7 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
             let sessionid = match result {
             Ok(maybesessionid) => match maybesessionid {
                 Some(sid) => sid,
-                None => return Ok(HttpResponse::InternalServerError().body("Sessionid was not fund".to_string())),
+                None => return Ok(HttpResponse::Unauthorized().body("Sessionid was not fund".to_string())),
             },
             Err(e) => return Ok(HttpResponse::InternalServerError().body(e.to_string())),
         };
@@ -265,6 +268,84 @@ pub fn restricted_route(_args: TokenStream, input: TokenStream) -> TokenStream {
         }
     };
     // Hand the output tokens back to the compiler
-    println!("{}",expanded);
     TokenStream::from(expanded)
+}
+
+use syn::{parse_macro_input, ItemFn};
+use proc_macro2::Span;
+/// The `enhance_with_style` attribute macro enhances a function by loading CSS for it.
+///
+/// When added to a function, this macro will insert code at the beginning of the function to load
+/// a CSS file. By default, the macro tries to load a CSS file based on the name of the current source
+/// file. However, you can also provide a custom path as an argument to the macro.
+///
+/// # Usage
+///
+/// Without an argument, the macro will use the source file's name:
+///
+/// ```ignore
+/// #[enhance_with_style]
+/// fn some_function() {
+///     // ...
+/// }
+/// ```
+///
+/// If used in a file named `example.rs`, the macro will try to load `example.css`.
+///
+/// With a custom CSS path:
+///
+/// ```ignore
+/// #[enhance_with_style("path/to/custom.css")]
+/// fn another_function() {
+///     // ...
+/// }
+/// ```
+///
+/// Here, the macro will attempt to load the CSS file from "path/to/custom.css".
+#[proc_macro_attribute]
+pub fn enhance_with_style(attr: TokenStream, item: TokenStream) -> TokenStream {
+    // Parse the input tokens into a syntax tree
+    let input_fn = parse_macro_input!(item as ItemFn);
+
+    // Try to parse the attribute input as a string literal (CSS file path)
+    let css_path: Option<String> = if !attr.is_empty() {
+        let parsed_path = parse_macro_input!(attr as LitStr);
+        Some(parsed_path.value())
+    } else {
+        None
+    };
+
+    // Determine the CSS path
+    let css_filename = if let Some(path) = css_path {
+        path
+    } else {
+        // Use the span to get a reference to the source file
+        let span = Span::call_site();
+        let file = span.unstable().source_file();
+        let path_str = file.path().display().to_string();
+        let path = std::path::Path::new(&path_str);
+        if let Some(stem) = path.file_stem() {
+            let stem_str = stem.to_string_lossy();
+            format!("{}.css", stem_str)
+        } else {
+            panic!("Unable to extract file stem!");
+        }
+    };
+
+    // Extract function parts
+    let attrs = &input_fn.attrs;
+    let vis = &input_fn.vis;
+    let sig = &input_fn.sig;
+    let block = &input_fn.block;
+
+    // Generate the desired code
+    let gen = quote::quote! {
+        #(#attrs)* #vis #sig {
+            let styles = Style::new(style_macros::css_file!(#css_filename));
+            #block
+        }
+    };
+
+    // Return the new code
+    gen.into()
 }

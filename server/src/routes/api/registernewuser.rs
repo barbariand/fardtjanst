@@ -1,13 +1,12 @@
 use super::{RequestError, User};
 use crate::db;
 use crate::{AppData, MAX_PAYLOAD_SIZE, MOCK_SERVER_URL};
-use actix_session::Session;
 use actix_web::Result;
 use actix_web::{error, post, web};
 use actix_web::{ HttpResponse, Responder};
 use db::{
-    sea_orm::{ColumnTrait, EntityTrait, QueryFilter},
-    tempsessions, users, TempSession, Users,
+    sea_orm::EntityTrait,
+     users, Users,
 };
 use futures::StreamExt;
 use log::error;
@@ -23,7 +22,6 @@ struct RegisterdUser{
 #[post("/api/register")]
 async fn register_user(
     data: web::Data<AppData>,
-    session: Session,
     mut payload: web::Payload,
 ) -> Result<impl Responder> {
     let mut body = web::BytesMut::new();
@@ -70,7 +68,7 @@ async fn register_user(
         }
     };
     let register_user=match res.json::<RegisterdUser>().await{
-        Err(e)=>{
+        Err(_)=>{
             return Ok(HttpResponse::BadGateway())
         }
         Ok(u)=>u,

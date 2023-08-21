@@ -1,19 +1,18 @@
-use super::{RequestError, User,get_authorized_request};
+
 use crate::backgroundtask::Order;
 use crate::db;
-use crate::{AppData, MAX_PAYLOAD_SIZE, MOCK_SERVER_URL};
+use crate::{AppData, MAX_PAYLOAD_SIZE};
 use actix_session::Session;
 use actix_web::Result;
 use actix_web::{error, post, web};
 use actix_web::{ HttpResponse, Responder};
 use db::{
-    sea_orm::{ColumnTrait, EntityTrait, QueryFilter},
-    tempsessions, users, TempSession, Users,
+    sea_orm::{ EntityTrait, },
+    tempsessions, users,
 };
 use sea_orm::QuerySelect;
 use sea_orm::RelationTrait;
 use sea_orm::sea_query::IntoCondition;
-use serde::Deserialize;
 use futures::StreamExt;
 #[post("/api/order")]
 #[macros::restricted_route]
@@ -30,6 +29,6 @@ async fn register_user(
         }
         body.extend_from_slice(&chunk);
     }
-    data.addr.send(Order::new(body.freeze(), &user,data.addr.clone()));
+    data.addr.send(Order::new(body.freeze(), &user,data.addr.clone(),user.id));
     Ok(HttpResponse::Ok().finish())
 }

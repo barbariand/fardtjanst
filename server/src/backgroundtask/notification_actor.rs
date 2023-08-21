@@ -3,7 +3,8 @@ use log::error;
 use actix::AsyncContext;
 use actix::{Actor, Context, Addr, Message, Handler};
 use crate::db::{users,notification_info};
-use super::{tripsSerilizing::{Trips, ReservationStatusEnum}, get_trip_request, notifier::{self, SendNotification},check_trip::CheckOnItsWay};
+use api_structs::*;
+use super::{ get_trip_request, notifier:: SendNotification,check_trip::CheckOnItsWay};
 use chrono::Utc;
 #[derive(Clone)]
 pub struct NotificationActor {}
@@ -70,7 +71,7 @@ impl Handler<StartChecking> for NotificationActor {
             };
             if let Some(status) = current_trip.get_departure().get_status() {
                 if status == ReservationStatusEnum::BilPåväg {
-                    let notification = notifier::Notification::new(
+                    let notification = Notification::new(
                         "Färdtjänst Notifier".to_string(),
                     )
                     .add_icon(
@@ -159,7 +160,7 @@ impl Handler<CheckOnItsWay> for NotificationActor {
             };
             if let Some(status) = current_trip.get_departure().get_status() {
                 if status == ReservationStatusEnum::BilPåväg {
-                    let notification = notifier::Notification::new(
+                    let notification = Notification::new(
                         "Färdtjänst Notifier".to_string(),
                     )
                     .add_icon(

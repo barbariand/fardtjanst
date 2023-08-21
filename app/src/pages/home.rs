@@ -1,11 +1,14 @@
-use crate::api::*;
 use leptos::*;
 use leptos_router::*;
-use super::components::*;
+
+use crate::Page;
+
 #[component]
-fn home(cx: Scope, user_info: Signal<Option<UserInfo>>) -> impl IntoView {
-    view! {
-        cx,
-        <div></div>
+pub fn Home(
+    cx: Scope,
+) -> impl IntoView
+{
+    view! { cx,
+      <div>"hellp"</div>
     }
 }

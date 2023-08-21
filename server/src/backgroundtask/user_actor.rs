@@ -4,7 +4,7 @@ use chrono::Utc;
 use actix::AsyncContext;
 use crate::{db::{users,notification_info}, backgroundtask::get_trip_request};
 use log::{info,error};
-use super::{notification_actor::NotificationActor,notification_actor::StartChecking, notifier::SendNotification, };
+use super::{notification_actor::NotificationActor,notification_actor::StartChecking, };
 
 #[derive(Clone)]
 pub struct UserActor {}
