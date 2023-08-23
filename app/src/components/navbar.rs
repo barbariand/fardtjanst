@@ -1,8 +1,10 @@
 use leptos::*;
 use leptos_router::*;
+use stylist::Style;
 
 use crate::Page;
-
+use macros;
+#[macros::enhance_with_style]
 #[component]
 pub fn NavBar<F>(
     cx: Scope,
@@ -12,20 +14,29 @@ pub fn NavBar<F>(
 where
     F: Fn() + 'static + Clone,
 {
-    view! { cx,
+  
+  styled_macro::view! { cx,
+    styles=styles,
+    <style>
+            "nav {
+              color: white;
+          }
+          "
+            </style>
       <nav>
+      
         <Show
           when = move || logged_in.get()
           fallback = |cx| view! { cx,
-            <A href=Page::Login.path() >"Login"</A>
+            <a href=Page::Login.path()>"Login"</a>
             " | "
-            <A href=Page::Register.path() >"Register"</A>
+            <a href=Page::Register.path()>"Register"</a>
           }
         >
-          <button on:click={
+          <a style="color: white;" href="javascript:;" on:click={
             let on_logout = on_logout.clone();
             move |_| on_logout()
-          }>"Logout"</button>
+          }>"Logout"</a>
         </Show>
       </nav>
     }

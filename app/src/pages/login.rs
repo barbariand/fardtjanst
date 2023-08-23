@@ -5,7 +5,7 @@ use api_structs::*;
 
 use crate::{
     api::{self, AuthorizedApi, UnauthorizedApi},
-    components::credentials::*,
+    components::login_credentials::*,
     Page,
 };
 use api_structs::User;
