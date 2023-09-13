@@ -208,7 +208,7 @@ impl TripsRequest {
 }
 #[derive(Serialize, Deserialize, Default, Debug,Clone)]
 pub struct User {
-    pub username: String,
+    pub username: i32,
     pub password: String,
 }
 pub trait IntoUser{
@@ -368,5 +368,17 @@ impl Notification {
     fn add_action(mut self, action: NotificationAction)->Self {
         self.options.add_action(action);
         self
+    }
+}
+#[derive(Deserialize,Serialize,Clone)]
+pub struct RegestringUser{
+    pub name: String,
+    pub password: String,
+    pub card_nummer: i32,
+    pub färtjänst_password: String,
+}
+impl IntoUser for RegestringUser{
+    fn into_user(self) -> User {
+        User{password:self.färtjänst_password,username:self.card_nummer}
     }
 }

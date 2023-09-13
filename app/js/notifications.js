@@ -29,7 +29,7 @@ export function askForNotifications(str) {
     });
     
 }
-function subscribeUserToPush() {
+export function subscribeUserToPush() {
     return navigator.serviceWorker
         .register('/resources/service-worker.js')
         .then(function (registration) {

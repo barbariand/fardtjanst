@@ -1,5 +1,4 @@
 use leptos::*;
-use leptos_router::*;
 use stylist::Style;
 
 use crate::Page;

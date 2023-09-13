@@ -6,15 +6,16 @@ use crate::{MOCK_SERVER_URL, db};
 use reqwest::{ IntoUrl, RequestBuilder};
 pub mod trips;
 pub mod logout;
-use api_structs::{User,IntoUser};
+use api_structs::{User,IntoUser, RegestringUser};
 impl IntoUser for &db::users::Model{
     fn into_user(self) -> User {
         User{
-            username:self.name.clone(),
+            username:self.card_nummer,
             password:self.password.clone(),
         }
     }
 }
+
 
 pub enum RequestError {
     Reqwest(reqwest::Error),

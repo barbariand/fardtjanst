@@ -11,6 +11,8 @@ use db::{
 use futures::StreamExt;
 use log::error;
 use sea_orm::ActiveValue;
+
+use api_structs::RegestringUser;
 use serde::Deserialize;
 #[derive(Deserialize)]
 struct RegisterdUser{
@@ -32,7 +34,7 @@ async fn register_user(
         }
         body.extend_from_slice(&chunk);
     }
-    let user = match serde_json::from_slice::<User>(&body) {
+    let user = match serde_json::from_slice::<RegestringUser>(&body) {
         Ok(au) => au,
         Err(e) => {
             error!(target:"/api/autherization",
@@ -47,7 +49,7 @@ async fn register_user(
         }
     };
     let res=match super::get_authorized_request(
-        user,
+        user.clone(),
         reqwest::Method::GET,
         MOCK_SERVER_URL.to_string() + "/profile",
     )
@@ -75,9 +77,10 @@ async fn register_user(
     };
     let insert=users::ActiveModel{
         card_nummer:ActiveValue::Set(register_user.card_nummer),
-        name:ActiveValue::Set(register_user.name),
-        password:ActiveValue::Set(register_user.password),
+        name:ActiveValue::Set(user.name),
+        färdjänst_passsword:ActiveValue::Set(user.färtjänst_password),
         phone_number:ActiveValue::Set(register_user.phone_number),
+        password:ActiveValue::Set(user.password),
         ..Default::default()
     };
     Users::insert(insert).exec(data.get_db()).await.expect("db is down");

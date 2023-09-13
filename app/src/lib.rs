@@ -1,8 +1,5 @@
-use components::navbar::*;
 use gloo_storage::{LocalStorage, Storage};
 use leptos::*;
-use leptos::html::Style;
-use leptos_meta::Stylesheet;
 use leptos_router::*;
 mod api;
 mod pages;
@@ -10,13 +7,11 @@ use components::footer::*;
 use components::header::*;
 pub mod components;
 use pages::*;
-use stylist::StyleSource;
 const DEFAULT_API_URL: &str = "/api";
 pub const API_TOKEN_STORAGE_KEY: &str = "api-token";
 #[component]
 pub fn start(cx: Scope) -> impl IntoView {
-    
-    let styles=styled::style!(
+    let styles = styled::style!(
         *{
             background-color:#27272c;
         }
@@ -71,7 +66,7 @@ pub fn start(cx: Scope) -> impl IntoView {
             }
         }
     });
-    
+
     // -- callbacks -- //
 
     let on_logout = move || {
@@ -87,7 +82,7 @@ pub fn start(cx: Scope) -> impl IntoView {
     //log::debug!("User is logged in: {}", logged_in.get());
 
     // -- effects -- //
-    
+
     create_effect(cx, move |_| {
         log::debug!("API authorization state changed");
         match authorized_api.get() {
@@ -104,14 +99,15 @@ pub fn start(cx: Scope) -> impl IntoView {
             }
         }
     });
-    
+
     styled_macro::view! {
         cx,
         styles=styles,
         <style>
-        "html {
+        "html, body{
             position: relative;
             min-height: 100%;
+            height:
         }"
         </style>
         <div id="main">
@@ -122,7 +118,7 @@ pub fn start(cx: Scope) -> impl IntoView {
                     <Route
                     path=Page::Home.path()
                     view=move |cx| view! { cx,
-                        <Show when=move || logged_in.get()
+                        <Show when=move || logged_in.get()&&authorized_api.get().is_some()
                         fallback=move |cx| view! { cx, <Login api=unauthorized_api
                             on_success=move |api| {
                             log::info!("Successfully logged in");
@@ -133,7 +129,7 @@ pub fn start(cx: Scope) -> impl IntoView {
                         }
                         /> }
                         >
-                        <Home/><button />
+                        <Home api=authorized_api/><button />
                     </Show>
                     }/>
                     <Route path=Page::Login.path() view= move |cx| view! {cx,<Login api=unauthorized_api
@@ -146,8 +142,16 @@ pub fn start(cx: Scope) -> impl IntoView {
                 }
                 />}/>
                     <Route
-                    path=Page::Register.path() view=move |_| "hello"
-                    />  
+                    path=Page::Register.path() view=move |cx|  view! {cx,<Register api=unauthorized_api
+                        on_success=move |api| {
+                        log::info!("Successfully logged in");
+                        authorized_api.update(|v| *v = Some(api));
+                        let navigate = use_navigate(cx);
+                        navigate(Page::Home.path(), Default::default()).expect("Home route");
+                        fetch_user_info.dispatch(());
+                    }
+                    />}
+                    />
                 </Routes>
             </main>
         </Router>
