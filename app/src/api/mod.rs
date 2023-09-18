@@ -68,11 +68,6 @@ export function subscribeUserToPush() {
             return pushSubscription;
         });
 }"#)]
-extern "C" {
-    #[wasm_bindgen(catch)]
-    async fn subscribeUserToPush() -> std::result::Result<JsValue, JsValue>;
-}
-
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct ApiToken {
     pub token: String,
